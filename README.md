@@ -8,7 +8,8 @@
 [![R-CMD-check](https://github.com/djnavarro/cranlint/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/djnavarro/cranlint/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![test-coverage](https://github.com/djnavarro/cranlint/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/djnavarro/cranlint/actions/workflows/test-coverage.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/djnavarro/cranlint/graph/badge.svg)](https://app.codecov.io/gh/djnavarro/cranlint)
 <!-- badges: end -->
 
 The goal of cranlint is to catch common, easy-to-miss mistakes made when
