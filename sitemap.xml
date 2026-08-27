@@ -8,8 +8,11 @@
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_description_length.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_global_env_write.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_hardcoded_seed.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cl_check_installed_packages.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_title_case.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cl_check_warn_suppression.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cranlint-package.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/index.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/lint_cran.html</loc></url>
 </urlset>
 

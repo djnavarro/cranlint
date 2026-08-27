@@ -4,11 +4,26 @@
 
 - [`cl_check_authors_r()`](https://cranlint.djnavarro.net/reference/cl_check_authors_r.md)
   : Check DESCRIPTION's Authors@R usage
+
 - [`cl_check_description_length()`](https://cranlint.djnavarro.net/reference/cl_check_description_length.md)
   : Check that DESCRIPTION's Description field is a full paragraph
+
 - [`cl_check_global_env_write()`](https://cranlint.djnavarro.net/reference/cl_check_global_env_write.md)
   : Check for writes to enclosing/global environments via \<\<- or -\>\>
+
 - [`cl_check_hardcoded_seed()`](https://cranlint.djnavarro.net/reference/cl_check_hardcoded_seed.md)
   : Check for hardcoded random seeds in package code
+
+- [`cl_check_installed_packages()`](https://cranlint.djnavarro.net/reference/cl_check_installed_packages.md)
+  : Check for calls to installed.packages()
+
 - [`cl_check_title_case()`](https://cranlint.djnavarro.net/reference/cl_check_title_case.md)
   : Check that DESCRIPTION's Title field is in Title Case
+
+- [`cl_check_warn_suppression()`](https://cranlint.djnavarro.net/reference/cl_check_warn_suppression.md)
+  :
+
+  Check for options(warn = )
+
+- [`lint_cran()`](https://cranlint.djnavarro.net/reference/lint_cran.md)
+  : Run all cranlint checks against a package
