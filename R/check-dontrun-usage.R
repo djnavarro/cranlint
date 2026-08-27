@@ -1,4 +1,4 @@
-#' Check for \dontrun{} usage in .Rd examples
+#' Check for `\dontrun{}` usage in .Rd examples
 #'
 #' Flags every line containing `\dontrun{` in a package's `man/*.Rd`
 #' files. This is a soft, review-level finding rather than a hard fail:

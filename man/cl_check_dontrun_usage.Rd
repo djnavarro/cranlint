@@ -2,7 +2,7 @@
 % Please edit documentation in R/check-dontrun-usage.R
 \name{cl_check_dontrun_usage}
 \alias{cl_check_dontrun_usage}
-\title{Check for \dontrun{} usage in .Rd examples}
+\title{Check for \verb{\dontrun{}} usage in .Rd examples}
 \usage{
 cl_check_dontrun_usage(path = ".")
 }
