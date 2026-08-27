@@ -20,12 +20,11 @@ from \code{Authors@R} -- per the CRAN Cookbook, that disagreement results in
 automatic rejection.
 }
 \details{
-The generated-value comparison relies on the same (non-exported) base R
-helpers \verb{R CMD check} itself uses to derive \code{Author}/\code{Maintainer} from
-\code{Authors@R} (\code{utils:::.format_authors_at_R_field_for_author()} and
-\code{...for_maintainer()}). This is inherently a little fragile -- an R
-release could change or remove them -- so the comparison is skipped
-(rather than erroring) if they're unavailable; presence of a manual
-field is still reported as informational context in that case, just
-without asserting a match/mismatch.
+The generated-value comparison reconstructs what \verb{R CMD build} would
+generate using only the exported \code{format()} generic for \code{person}
+objects (see \code{.cl_expected_author()}/\code{.cl_expected_maintainer()} in
+\code{R/utils-desc.R}), rather than calling the unexported base R helpers
+that perform the equivalent comparison during \verb{R CMD check} -- doing so
+via \code{:::} produced a dependency NOTE on every check, including in CI,
+even though cranlint isn't meant for CRAN submission itself.
 }

@@ -5,14 +5,13 @@
 #' from `Authors@R` -- per the CRAN Cookbook, that disagreement results in
 #' automatic rejection.
 #'
-#' The generated-value comparison relies on the same (non-exported) base R
-#' helpers `R CMD check` itself uses to derive `Author`/`Maintainer` from
-#' `Authors@R` (`utils:::.format_authors_at_R_field_for_author()` and
-#' `...for_maintainer()`). This is inherently a little fragile -- an R
-#' release could change or remove them -- so the comparison is skipped
-#' (rather than erroring) if they're unavailable; presence of a manual
-#' field is still reported as informational context in that case, just
-#' without asserting a match/mismatch.
+#' The generated-value comparison reconstructs what `R CMD build` would
+#' generate using only the exported `format()` generic for `person`
+#' objects (see `.cl_expected_author()`/`.cl_expected_maintainer()` in
+#' `R/utils-desc.R`), rather than calling the unexported base R helpers
+#' that perform the equivalent comparison during `R CMD check` -- doing so
+#' via `:::` produced a dependency NOTE on every check, including in CI,
+#' even though cranlint isn't meant for CRAN submission itself.
 #'
 #' @param path Path to the package root. Defaults to the current directory.
 #'
@@ -56,10 +55,7 @@ cl_check_authors_r <- function(path = ".") {
   } else {
     NA_character_
   }
-  expected_author <- tryCatch(
-    .cl_normalize_ws(utils:::.format_authors_at_R_field_for_author(authors)),
-    error = function(e) NA_character_
-  )
+  expected_author <- .cl_expected_author(authors)
   if (!is.na(manual_author) && !is.na(expected_author) &&
     !identical(manual_author, expected_author)) {
     messages <- c(messages, paste0(
@@ -74,10 +70,7 @@ cl_check_authors_r <- function(path = ".") {
   } else {
     NA_character_
   }
-  expected_maintainer <- tryCatch(
-    .cl_normalize_ws(utils:::.format_authors_at_R_field_for_maintainer(authors)),
-    error = function(e) NA_character_
-  )
+  expected_maintainer <- .cl_expected_maintainer(authors)
   if (!is.na(manual_maintainer) && !is.na(expected_maintainer) &&
     !identical(manual_maintainer, expected_maintainer)) {
     messages <- c(messages, paste0(

@@ -118,21 +118,16 @@ and sharing `desc`-based parsing (added `desc` to `Imports`, alongside a
   ["Using Authors@R"](https://contributor.r-project.org/cran-cookbook/description_issues.html#using-authorsr)
   recipe (CRAN treats such disagreement as an automatic rejection).
 
-The `authors_r` mismatch comparison intentionally calls the same
-non-exported base R helpers `R CMD check` itself uses to derive
-`Author`/`Maintainer` from `Authors@R`
-(`utils:::.format_authors_at_R_field_for_author()` and `...for_maintainer()`,
-found by reading `tools:::.check_package_description_authors_at_R_field`,
-the internal function that produces the real "Author field differs from
-that derived from Authors@R" NOTE). This was a deliberate accuracy/fragility
-trade-off: reimplementing the derivation heuristically risked false
-positives/negatives, while calling the real internal logic is exact but
-depends on unexported APIs that could change across R versions (confirmed
-via `rcmdcheck::rcmdcheck()`: this produces exactly one NOTE, "Unexported
-objects imported by ':::' calls", and no errors/warnings -- acceptable
-since cranlint itself is not intended for CRAN submission). Both calls are
-wrapped in `tryCatch()` so a future removal degrades to skipping the
-match/mismatch comparison rather than erroring.
+The `authors_r` mismatch comparison originally called the same non-exported
+base R helpers `R CMD check` itself uses to derive `Author`/`Maintainer`
+from `Authors@R` (`utils:::.format_authors_at_R_field_for_author()` and
+`...for_maintainer()`, found by reading
+`tools:::.check_package_description_authors_at_R_field`, the internal
+function that produces the real "Author field differs from that derived
+from Authors@R" NOTE). This was superseded (see "Replacing `:::` calls"
+below) after the resulting `R CMD check` NOTE turned out to fail CI, which
+runs `R CMD check` on cranlint itself even though cranlint isn't meant for
+CRAN submission.
 
 Fixtures live under `tests/testthat/fixtures/desc/<scenario>/DESCRIPTION`,
 one minimal DESCRIPTION file per scenario (good, short-description,
@@ -242,6 +237,35 @@ warning without stopping the other checks).
 Returns a plain tibble, no new S3 class -- deferred again pending an
 actual need (e.g. a print method grouping findings by severity), per the
 original output-contract decision.
+
+## Replacing `:::` calls in `authors_r` with exported `format()`
+
+The original `authors_r` mismatch comparison (see above) called two
+non-exported `utils:::` helpers, accepting a single `R CMD check` NOTE as
+a deliberate trade-off. In practice this NOTE made CI's `R CMD check` step
+fail on every run, which isn't acceptable even for a non-CRAN package with
+its own CI. Replaced both calls with a from-scratch reimplementation using
+only the exported `format()` S3 generic for `person` objects:
+
+- `.cl_expected_author(persons)`: formats each person as
+  `format(person, include = c("given", "family", "role"))` (deliberately
+  omitting `email`, which the real `Author` field never includes) and
+  joins them with `",\n  "` -- verified byte-for-byte identical to
+  `utils:::.format_authors_at_R_field_for_author()`'s output across the
+  cases tested (multiple authors, roles, with/without email).
+- `.cl_expected_maintainer(persons)`: filters to the person(s) with role
+  `"cre"`, and if there's exactly one, formats them as
+  `format(person, include = c("given", "family", "email"))` -- likewise
+  verified identical to `utils:::.format_authors_at_R_field_for_maintainer()`.
+  Returns `NA` (skipping the comparison) if there's zero or more than one
+  `"cre"` person, mirroring how the internal check itself declines to
+  produce a comparable `Maintainer` value in the same situations.
+
+Both live in `R/utils-desc.R` alongside `.cl_read_desc()`. `R CMD check`
+now runs clean (0 errors, 0 warnings, 0 notes). This is a closer parity
+than the earlier trade-off assumed was necessary -- `format()` on `person`
+objects turned out to already expose exactly the building blocks the
+internal helpers use, so no accuracy was given up by dropping `:::`.
 
 ## Moving to the `.agents/` folder structure
 
