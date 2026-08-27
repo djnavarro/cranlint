@@ -26,7 +26,7 @@ Checks run in this order: \code{cl_check_description_length()},
 \code{cl_check_quoted_software_names()}, \code{cl_check_quoted_function_names()},
 \code{cl_check_hardcoded_seed()}, \code{cl_check_global_env_write()},
 \code{cl_check_installed_packages()}, \code{cl_check_warn_suppression()},
-\code{cl_check_verbose_output()}. If a
+\code{cl_check_verbose_output()}, \code{cl_check_option_restoration()}. If a
 check errors -- for example, because \code{path} has no \code{DESCRIPTION} file at
 all -- that error propagates rather than being caught and turned into a
 result row, since it signals something more fundamental than an

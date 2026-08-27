@@ -248,6 +248,37 @@
   unique(fn_names)
 }
 
+#' Find the innermost function enclosing a given parse-data row
+#'
+#' Unlike `.cl_enclosing_function_names()`, this returns the nearest
+#' enclosing function regardless of whether it's named -- used where what
+#' matters is the function *frame* itself (e.g. whether an `on.exit()`
+#' call lives in the same frame as a `par()`/`options()`/`setwd()` call),
+#' not what the function happens to be called.
+#'
+#' @param pd A parse-data data frame from `.cl_scan_r_files()`.
+#' @param row A single row of `pd` to find the innermost enclosing
+#'   function of.
+#' @return The parse-data `id` of the nearest enclosing function-definition
+#'   `expr`, or `NA_integer_` if `row` isn't nested inside any function.
+#' @noRd
+.cl_innermost_enclosing_function_id <- function(pd, row) {
+  current <- row$parent
+  seen <- integer()
+  while (length(current) == 1 && !is.na(current) && current != 0) {
+    if (current %in% seen) break
+    seen <- c(seen, current)
+
+    if (any(pd$parent == current & pd$token == "FUNCTION")) {
+      return(current)
+    }
+
+    parent_row <- pd$parent[pd$id == current]
+    current <- if (length(parent_row) == 0) NA_integer_ else parent_row[1]
+  }
+  NA_integer_
+}
+
 #' Get the source text of each argument expression in a call
 #'
 #' @param pd The parse-data data frame the call row came from.

@@ -405,3 +405,46 @@ accepted mitigation -- gating the call behind a `verbose` argument, e.g.
 `if (verbose) cat(...)` -- isn't recognized as an exemption either.
 Both are called out in the function's docstring rather than silently
 handled.
+
+## `check_option_restoration()`
+
+Implemented the second of the two remaining code checks. Flags
+`par()`/`options()`/`setwd()` calls in `R/` that change state without a
+paired `on.exit()` restore in the same function frame.
+
+Reused `.cl_call_args()` (already built for `warn_suppression`) to
+inspect a call's arguments and decide whether it's a state *change* at
+all, via a new `.cl_is_state_change()`:
+
+- `setwd()` always counts (no query form exists).
+- A bare `par()`/`options()` call, or one with only unnamed/positional
+  arguments (e.g. `par("mfrow")`, or `par(oldpar)`/`options(oldopts)`
+  restoring a previously-saved list), is treated as a query/restore, not
+  a change.
+- `par(no.readonly = TRUE)` specifically is excluded even though it has a
+  named argument, since it's the standard snapshot-for-later-restore
+  idiom the Cookbook itself recommends (`oldpar <- par(no.readonly =
+  TRUE)`), not a change by itself.
+- Anything else with at least one named argument counts as a change.
+
+Added `.cl_innermost_enclosing_function_id()` to `R/utils-scan.R` --
+similar to `.cl_enclosing_function_names()` (added for `verbose_output`)
+but returns the nearest enclosing function regardless of whether it's
+named, since what matters here is the function *frame* `on.exit()` needs
+to share, not what the function is called. Used both to find the frame a
+change happens in, and (via a new `.cl_onexit_frame_ids()` in
+`check-option-restoration.R`) to find which frames contain an `on.exit()`
+call at all. A change is exempt if its frame id is in that set.
+
+This correctly isolates nested functions from each other during testing:
+an `on.exit()` inside a nested helper function does *not* exempt a
+`par()`/`options()`/`setwd()` change in the outer function that defines
+the helper, since they're different frames -- verified with a
+`nested_bad()` fixture case.
+
+Known, documented coarseness (two ways this under- or over-reports):
+presence of *any* `on.exit()` call in the same frame counts as a restore,
+without checking it actually restores the same thing that was changed;
+and ordering (the Cookbook says the restore should be registered
+*immediately* after the change) isn't checked either, only that both
+calls exist somewhere in the same frame.

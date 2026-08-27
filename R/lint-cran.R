@@ -10,7 +10,7 @@
 #' `cl_check_quoted_software_names()`, `cl_check_quoted_function_names()`,
 #' `cl_check_hardcoded_seed()`, `cl_check_global_env_write()`,
 #' `cl_check_installed_packages()`, `cl_check_warn_suppression()`,
-#' `cl_check_verbose_output()`. If a
+#' `cl_check_verbose_output()`, `cl_check_option_restoration()`. If a
 #' check errors -- for example, because `path` has no `DESCRIPTION` file at
 #' all -- that error propagates rather than being caught and turned into a
 #' result row, since it signals something more fundamental than an
@@ -37,7 +37,8 @@ lint_cran <- function(path = ".") {
     cl_check_global_env_write,
     cl_check_installed_packages,
     cl_check_warn_suppression,
-    cl_check_verbose_output
+    cl_check_verbose_output,
+    cl_check_option_restoration
   )
 
   results <- lapply(checks, function(check) check(path))

@@ -6,7 +6,7 @@ a changelog: once an item here is completed, its write-up should move to
 [.agents/HISTORY.md](HISTORY.md) and be removed from this file rather than
 marked "done" in place.
 
-Last reviewed: 2026-08-28 (later still).
+Last reviewed: 2026-08-28 (later still, again).
 
 ## v1 check inventory
 
@@ -25,9 +25,7 @@ build order (cheapest/highest-value first):
    `Maintainer` fields inconsistent with it (parse via `desc`).
 ### Code checks
 
-5. `check_option_restoration()` -- `par()`/`options()`/`setwd()` changed
-   without a paired `on.exit()` restore in the same function.
-6. `check_dontrun_usage()` -- flags `\dontrun{}` for manual review (can't
+5. `check_dontrun_usage()` -- flags `\dontrun{}` for manual review (can't
    judge runnability automatically, so this should be a soft/review-level
    finding, not a hard fail).
 
@@ -70,6 +68,12 @@ build order (cheapest/highest-value first):
   writing to a file/connection rather than the console, and a call gated
   behind a `verbose` argument (`if (verbose) cat(...)`). Revisit if these
   produce noisy false positives in practice.
+- `check_option_restoration()` treats any `on.exit()` call in the same
+  function frame as a valid restore, without checking it actually
+  restores the same thing that changed, and doesn't check that the
+  restore is registered immediately after the change (only that both
+  exist somewhere in the same frame). Revisit if this proves too loose in
+  practice.
 
 ## Canonical-source staleness
 
