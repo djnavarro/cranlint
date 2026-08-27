@@ -96,6 +96,48 @@ any other column passed is length-0, so `.cl_new_result()` callers must
 always supply all six arguments together with consistent lengths, never
 mixing an omitted (empty) default with populated arguments.
 
+## First three checks: `description_length`, `title_case`, `authors_r`
+
+Implemented the first batch of `cl_check_*()` functions, all DESCRIPTION-only
+and sharing `desc`-based parsing (added `desc` to `Imports`, alongside a
+`.cl_read_desc(path)` helper in `R/utils-desc.R`).
+
+- `cl_check_description_length()`: flags a Description field with fewer
+  than 2 sentences (heuristic regex sentence-splitter), per the Cookbook's
+  ["Description Length"](https://contributor.r-project.org/cran-cookbook/general_issues.html#description-length)
+  recipe, which explicitly asks for "a short paragraph (2+ sentences)".
+- `cl_check_title_case()`: flags when `Title` differs from
+  `tools::toTitleCase(Title)`, per the Cookbook's
+  ["Title Case"](https://contributor.r-project.org/cran-cookbook/description_issues.html#title-case)
+  recipe. Findings are worded as a prompt to review, not an instruction to
+  blindly apply the suggestion, since `toTitleCase()` doesn't know about
+  proper nouns or quoted software names that should keep their casing.
+- `cl_check_authors_r()`: flags a missing `Authors@R` field, and flags
+  manual `Author`/`Maintainer` fields that disagree with what R would
+  generate from `Authors@R`, per the Cookbook's
+  ["Using Authors@R"](https://contributor.r-project.org/cran-cookbook/description_issues.html#using-authorsr)
+  recipe (CRAN treats such disagreement as an automatic rejection).
+
+The `authors_r` mismatch comparison intentionally calls the same
+non-exported base R helpers `R CMD check` itself uses to derive
+`Author`/`Maintainer` from `Authors@R`
+(`utils:::.format_authors_at_R_field_for_author()` and `...for_maintainer()`,
+found by reading `tools:::.check_package_description_authors_at_R_field`,
+the internal function that produces the real "Author field differs from
+that derived from Authors@R" NOTE). This was a deliberate accuracy/fragility
+trade-off: reimplementing the derivation heuristically risked false
+positives/negatives, while calling the real internal logic is exact but
+depends on unexported APIs that could change across R versions (confirmed
+via `rcmdcheck::rcmdcheck()`: this produces exactly one NOTE, "Unexported
+objects imported by ':::' calls", and no errors/warnings -- acceptable
+since cranlint itself is not intended for CRAN submission). Both calls are
+wrapped in `tryCatch()` so a future removal degrades to skipping the
+match/mismatch comparison rather than erroring.
+
+Fixtures live under `tests/testthat/fixtures/desc/<scenario>/DESCRIPTION`,
+one minimal DESCRIPTION file per scenario (good, short-description,
+bad-title, no-authors-r, authors-r-mismatch, authors-r-consistent).
+
 ## Moving to the `.agents/` folder structure
 
 Following the pattern established across other packages (`emaxnls`,
