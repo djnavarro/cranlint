@@ -3,3 +3,8 @@
 ^LICENSE\.md$
 ^AGENTS\.md$
 ^\.agents$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
+^codecov\.yml$

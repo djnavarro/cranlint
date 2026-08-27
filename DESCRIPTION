@@ -10,11 +10,13 @@ Description: A personal-use package that runs static checks against a
     seeds, and leftover debugging statements. Complements tools like
     'checkhelper' and 'rcmdcheck' rather than replacing them.
 License: MIT + file LICENSE
-URL: https://github.com/djnavarro/cranlint
+URL: https://github.com/djnavarro/cranlint, https://cranlint.djnavarro.net/
 BugReports: https://github.com/djnavarro/cranlint/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 8.0.0
 Suggests: 
+    pkgdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Config/Needs/website: djnavarro/waeponwifestre
