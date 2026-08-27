@@ -6,15 +6,21 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/djnavarro/cranlint/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/djnavarro/cranlint/actions/workflows/R-CMD-check.yaml)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![test-coverage](https://github.com/djnavarro/cranlint/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/djnavarro/cranlint/actions/workflows/test-coverage.yaml)
 <!-- badges: end -->
 
 The goal of cranlint is to catch common, easy-to-miss mistakes made when
 preparing an R package for CRAN submission – things like hardcoded
 random seeds, DESCRIPTION formatting issues, and writes to `.GlobalEnv`
 – that complement (rather than duplicate) tools like
-[checkhelper](https://thinkr-open.github.io/checkhelper/),
+[urlchecker](https://github.com/r-lib/urlchecker),
 [lintr](https://lintr.r-lib.org/), and
-[spelling](https://docs.ropensci.org/spelling/).
+[spelling](https://docs.ropensci.org/spelling/). Many of the checks used
+in the package are heuristics: do not treat the output as a definitive
+diagnostic. It exists to help detect common problems, but cannot serve
+as an authoritative source.
 
 ## Installation
 
