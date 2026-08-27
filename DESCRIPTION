@@ -15,6 +15,8 @@ BugReports: https://github.com/djnavarro/cranlint/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 8.0.0
+Imports: 
+    tibble
 Suggests: 
     pkgdown,
     testthat (>= 3.0.0)

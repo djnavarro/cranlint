@@ -54,6 +54,48 @@ encoding, roxygen2 with markdown enabled, testthat edition 3, git
 initialized with an initial commit. No check functions have been written
 yet -- see `.agents/PLAN.md` for the build order.
 
+## Function naming: `cl_` prefix
+
+Considered leaving check functions as bare `check_*()`, but that prefix is
+extremely common across the ecosystem and cranlint is meant to be used
+interactively alongside whatever else is loaded -- collisions/masking would
+be a real nuisance even without CRAN-namespace concerns. Settled on
+`cl_check_*()` (e.g. `cl_check_hardcoded_seed()`) for individual checks,
+keeping `lint_cran()` unprefixed as the one top-level orchestrator entry
+point, mirroring `lintr::lint()`.
+
+## Output contract
+
+Settled the shared return shape every `cl_check_*()` function must follow,
+so `lint_cran()` can `dplyr::bind_rows()` results uniformly. Each check
+returns a tibble with one row per finding (zero rows if clean), with
+columns `check` (character, short id like `"hardcoded_seed"`), `file`
+(character, path relative to package root), `line` (integer,
+`NA_integer_` when not tied to a specific line), `severity` (ordered
+factor), `message` (character), and `policy_reference` (character,
+URL/citation).
+
+For `severity`, considered mirroring `R CMD check`'s own vocabulary
+(`note`/`warning`/`error`) but rejected it: that would misleadingly imply
+cranlint findings are equivalent to actual check verdicts, when they're
+static-analysis heuristics. Chose a cranlint-specific ordered scale instead:
+`advisory` < `should_fix` < `must_fix`.
+
+Also decided: no `column`-level field in v1 (no planned check needs
+sub-line granularity yet), and no dedicated result S3 class yet (a plain
+tibble is enough; a `cranlint_results` class with print/summary methods can
+be added later at the `lint_cran()` orchestrator stage if useful).
+
+Implemented as the internal helper `.cl_new_result()` in
+`R/utils-result.R`, which validates `severity` values against the allowed
+set and, called with no arguments, returns a correctly-typed zero-row
+tibble -- the contract a check follows when it finds no issues. Added
+`tibble` to `Imports` to support this. One gotcha surfaced while testing:
+`tibble::tibble()` silently recycles a length-1 column down to 0 rows if
+any other column passed is length-0, so `.cl_new_result()` callers must
+always supply all six arguments together with consistent lengths, never
+mixing an omitted (empty) default with populated arguments.
+
 ## Moving to the `.agents/` folder structure
 
 Following the pattern established across other packages (`emaxnls`,

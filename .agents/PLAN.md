@@ -8,13 +8,6 @@ marked "done" in place.
 
 Last reviewed: 2026-08-27.
 
-## Before implementing anything: settle the output contract
-
-Every `check_*()` function needs to return a consistent shape so an
-orchestrator can combine results. Decide and document (in `AGENTS.md`)
-column names/types before writing the first check -- likely candidates:
-`file`, `line`, `severity`, `message`, `policy_reference`.
-
 ## v1 check inventory
 
 Drafted from the [CRAN Cookbook](https://contributor.r-project.org/cran-cookbook/)

@@ -51,7 +51,7 @@ checks to implement):
 R/
   check-<name>.R      # One file per check function (e.g. check-seed.R,
                        # check-description.R), each exporting a
-                       # check_<name>() function
+                       # cl_check_<name>() function
   lint-cran.R          # Orchestrator that runs all checks and combines
                        # their output (planned name: lint_cran(), mirroring
                        # lintr::lint())
@@ -60,19 +60,38 @@ tests/testthat/
                        # fixture packages/files under tests/testthat/fixtures/
 ```
 
-### Planned output contract
+### Output contract
 
-Every `check_*()` function should return a tibble with a consistent shape so
-results can be combined by the orchestrator. Exact column names/types are
-still to be decided -- likely candidates: `file`, `line`, `severity`,
-`message`, `policy_reference` (a URL or citation to the specific CRAN policy
-or Cookbook recipe that motivates the check). Decide and document this
-before implementing the first check.
+Every `cl_check_*()` function returns a tibble with one row per finding
+(zero rows if the check finds nothing), always with these columns:
+
+| Column             | Type            | Notes                                                                 |
+|--------------------|-----------------|------------------------------------------------------------------------|
+| `check`            | character       | Short id of the check, e.g. `"hardcoded_seed"`.                        |
+| `file`             | character       | Path relative to the package root, e.g. `"R/foo.R"` or `"DESCRIPTION"`.|
+| `line`             | integer         | `NA_integer_` when a finding isn't tied to a specific line.            |
+| `severity`         | ordered factor  | One of `"advisory"` < `"should_fix"` < `"must_fix"` (increasing urgency; a cranlint-specific scale, not `R CMD check`'s note/warning/error, since these are static-analysis heuristics rather than actual check verdicts). |
+| `message`          | character       | Human-readable description of the specific instance found.             |
+| `policy_reference` | character       | URL/citation to the CRAN policy or Cookbook recipe motivating the check.|
+
+Construct these tibbles via the internal helper `.cl_new_result()`
+(`R/utils-result.R`), which validates `severity` values and produces a
+correctly-typed zero-row tibble when called with no arguments -- this is
+the contract every check should follow when it finds no issues, so
+`dplyr::bind_rows()` in the orchestrator always works uniformly. There is
+no `column`-level field or dedicated result S3 class in v1; both can be
+added later (the latter likely at the `lint_cran()` orchestrator stage) if
+a concrete need arises.
 
 ### Naming conventions (planned)
 
-- Check functions: `check_<topic>()`, e.g. `check_hardcoded_seed()`,
-  `check_description_length()`.
+- Check functions: `cl_check_<topic>()`, e.g. `cl_check_hardcoded_seed()`,
+  `cl_check_description_length()`. The `cl_` prefix (short for cranlint)
+  avoids masking/collisions with the many other packages that export a bare
+  `check_*()` -- relevant since cranlint is meant to be used interactively
+  alongside whatever else is loaded, not called via `::`.
+- Orchestrator: `lint_cran()` is the one exception left unprefixed, as the
+  single top-level entry point (mirroring `lintr::lint()`).
 - Internal helpers: dot-prefixed, e.g. `.scan_r_files()`.
 
 ---
