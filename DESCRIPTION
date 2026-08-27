@@ -10,6 +10,8 @@ Description: A personal-use package that runs static checks against a
     seeds, and leftover debugging statements. Complements tools like
     'checkhelper' and 'rcmdcheck' rather than replacing them.
 License: MIT + file LICENSE
+URL: https://github.com/djnavarro/cranlint
+BugReports: https://github.com/djnavarro/cranlint/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 8.0.0
