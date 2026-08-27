@@ -43,3 +43,34 @@ test_that(".cl_find_calls returns zero rows when the function isn't called", {
   )
   expect_equal(nrow(.cl_find_calls(pd, "set.seed")), 0)
 })
+
+test_that(".cl_call_args pairs argument names with their value text", {
+  pd <- utils::getParseData(
+    parse(
+      text = "options(warn = -1)\noptions(digits = 3, warn = -2)\n",
+      keep.source = TRUE
+    ),
+    includeText = TRUE
+  )
+  calls <- .cl_find_calls(pd, "options")
+
+  args1 <- .cl_call_args(pd, calls[1, ])
+  expect_equal(args1$name, "warn")
+  expect_equal(args1$text, "-1")
+
+  args2 <- .cl_call_args(pd, calls[2, ])
+  expect_equal(args2$name, c("digits", "warn"))
+  expect_equal(args2$text, c("3", "-2"))
+})
+
+test_that(".cl_call_args gives positional arguments an empty name", {
+  pd <- utils::getParseData(
+    parse(text = "set.seed(42)\n", keep.source = TRUE),
+    includeText = TRUE
+  )
+  calls <- .cl_find_calls(pd, "set.seed")
+  args <- .cl_call_args(pd, calls[1, ])
+
+  expect_equal(args$name, "")
+  expect_equal(args$text, "42")
+})

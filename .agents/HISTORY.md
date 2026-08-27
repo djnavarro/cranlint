@@ -191,6 +191,32 @@ Fixtures live under `tests/testthat/fixtures/code/<scenario>/R/*.R`,
 mirroring the `fixtures/desc/<scenario>/DESCRIPTION` pattern used for the
 DESCRIPTION checks.
 
+## `installed_packages` and `warn_suppression`, plus named-argument support in the scan helpers
+
+Implemented `cl_check_installed_packages()` and `cl_check_warn_suppression()`,
+both simple call-site checks reusing `.cl_find_calls()`.
+
+`cl_check_installed_packages()` flags any `installed.packages()` call in
+`R/`, per the Cookbook's
+["Calling installed.packages()"](https://contributor.r-project.org/cran-cookbook/code_issues.html#calling-installed.packages)
+recipe. Severity `should_fix` (a "do not use" recommendation, not phrased
+as an outright policy violation like the two checks below).
+
+`cl_check_warn_suppression()` flags `options()` calls with a negative
+`warn` value, per the Cookbook's
+["Setting options(warn = -1)"](https://contributor.r-project.org/cran-cookbook/code_issues.html#setting-optionswarn--1)
+recipe, which states plainly "this is not allowed." Severity `must_fix`,
+matching `global_env_write`'s reasoning. Needed to distinguish `warn = -1`
+from other `options()` arguments by name, which the existing
+`.cl_call_arg_texts()` helper (used by `hardcoded_seed`, positional-only)
+couldn't do. Added `.cl_call_args(pd, call_row)` to `R/utils-scan.R`,
+returning a `name`/`text` data frame per argument (name is `""` for
+positional arguments) by walking a call's child parse-tree nodes in source
+order and pairing each `SYMBOL_SUB` (argument name) token with the `expr`
+node that follows it. Refactored `.cl_call_arg_texts()` to be a thin
+wrapper (`.cl_call_args(pd, call_row)$text`) so `hardcoded_seed` didn't
+need to change.
+
 ## Moving to the `.agents/` folder structure
 
 Following the pattern established across other packages (`emaxnls`,

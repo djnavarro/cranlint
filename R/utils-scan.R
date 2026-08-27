@@ -77,6 +77,46 @@
   pd[pd$token == "SYMBOL_FUNCTION_CALL" & pd$text %in% fun_names, ]
 }
 
+#' Get each argument of a call as a name/value pair
+#'
+#' @param pd The parse-data data frame the call row came from.
+#' @param call_row A single row of `pd`, as returned by `.cl_find_calls()`.
+#' @return A data frame with one row per argument, in argument order, and
+#'   columns `name` (the argument name, or `""` for a positional argument)
+#'   and `text` (the source text of the argument's value expression). Zero
+#'   rows if the call has no arguments or its structure can't be resolved.
+#' @noRd
+.cl_call_args <- function(pd, call_row) {
+  callee_expr_id <- call_row$parent
+  call_expr_id <- pd$parent[pd$id == callee_expr_id]
+  if (length(call_expr_id) == 0) {
+    return(data.frame(name = character(), text = character(), stringsAsFactors = FALSE))
+  }
+
+  # Named arguments show up as a SYMBOL_SUB token (the name) followed by an
+  # EQ_SUB token ('='), then the value's own `expr` node -- all as siblings
+  # under the call's expr id. Walk siblings in source order, remembering the
+  # most recent SYMBOL_SUB as the pending name for the next `expr` we see.
+  children <- pd[pd$parent == call_expr_id & pd$id != callee_expr_id, ]
+  children <- children[order(children$line1, children$col1), ]
+
+  names <- character()
+  texts <- character()
+  pending_name <- NA_character_
+  for (i in seq_len(nrow(children))) {
+    row <- children[i, ]
+    if (row$token == "SYMBOL_SUB") {
+      pending_name <- trimws(row$text)
+    } else if (row$token == "expr") {
+      names <- c(names, if (is.na(pending_name)) "" else pending_name)
+      texts <- c(texts, trimws(row$text))
+      pending_name <- NA_character_
+    }
+  }
+
+  data.frame(name = names, text = texts, stringsAsFactors = FALSE)
+}
+
 #' Get the source text of each argument expression in a call
 #'
 #' @param pd The parse-data data frame the call row came from.
@@ -87,13 +127,5 @@
 #'   has no arguments or its structure can't be resolved.
 #' @noRd
 .cl_call_arg_texts <- function(pd, call_row) {
-  callee_expr_id <- call_row$parent
-  call_expr_id <- pd$parent[pd$id == callee_expr_id]
-  if (length(call_expr_id) == 0) {
-    return(character())
-  }
-  arg_rows <- pd[
-    pd$parent == call_expr_id & pd$token == "expr" & pd$id != callee_expr_id,
-  ]
-  trimws(arg_rows$text)
+  .cl_call_args(pd, call_row)$text
 }
