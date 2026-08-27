@@ -121,17 +121,20 @@
 #'
 #' Walks every `<-`/`=` assignment in `pd` (at any nesting level -- a
 #' helper defined inside another function still counts) and records the
-#' assigned name when the right-hand side is a `function(...)` expression.
-#' Used by `cl_check_quoted_function_names()` to build the list of
-#' function names "owned" by the package being linted.
+#' assigned name and the `id` of the `function(...)` expr when the
+#' right-hand side is a function definition. The `id` is what lets
+#' `.cl_enclosing_function_names()` map a function-definition expr found
+#' while walking up a call's ancestor chain back to the name it was
+#' assigned to (if any -- anonymous functions have no matching row here).
 #'
 #' @param pd A parse-data data frame from `.cl_scan_r_files()`.
-#' @return A character vector of function names, possibly with
-#'   duplicates removed but otherwise unprocessed (no deduplication across
-#'   multiple files -- callers combine and dedupe themselves).
+#' @return A data frame with one row per named function assignment found,
+#'   and columns `id` (the function `expr`'s parse-data id) and `name`
+#'   (the assigned name). Zero rows if none are found.
 #' @noRd
-.cl_extract_function_names <- function(pd) {
+.cl_function_assignments <- function(pd) {
   assigns <- pd[pd$token %in% c("LEFT_ASSIGN", "EQ_ASSIGN"), ]
+  ids <- integer()
   names_out <- character()
   for (i in seq_len(nrow(assigns))) {
     a <- assigns[i, ]
@@ -146,10 +149,26 @@
     if (nrow(sym) != 1) next
 
     if (any(pd$parent == rhs_child$id & pd$token == "FUNCTION")) {
+      ids <- c(ids, rhs_child$id)
       names_out <- c(names_out, sym$text)
     }
   }
-  names_out
+  data.frame(id = ids, name = names_out, stringsAsFactors = FALSE)
+}
+
+#' Find function-valued top-level and nested assignments in parse data
+#'
+#' Thin wrapper around `.cl_function_assignments()` for callers that only
+#' need the names, not the `id`s. Used by `cl_check_quoted_function_names()`
+#' to build the list of function names "owned" by the package being linted.
+#'
+#' @param pd A parse-data data frame from `.cl_scan_r_files()`.
+#' @return A character vector of function names, possibly with
+#'   duplicates removed but otherwise unprocessed (no deduplication across
+#'   multiple files -- callers combine and dedupe themselves).
+#' @noRd
+.cl_extract_function_names <- function(pd) {
+  .cl_function_assignments(pd)$name
 }
 
 #' List every function name defined anywhere in a package's R/ directory
@@ -161,6 +180,45 @@
 .cl_defined_function_names <- function(path = ".") {
   parsed_files <- .cl_scan_r_files(path)
   unique(unlist(lapply(parsed_files, .cl_extract_function_names), use.names = FALSE))
+}
+
+#' Find the names of every named function enclosing a given parse-data row
+#'
+#' Walks up `row`'s ancestor chain (via `parent` ids) to the top of the
+#' file, collecting the assigned name of every function definition passed
+#' through along the way -- not just the innermost one, so a call nested
+#' inside an anonymous helper (e.g. inside `lapply(x, function(z) ...)`)
+#' still surfaces the name of whatever named function encloses that
+#' helper. Anonymous functions in the chain contribute nothing (they have
+#' no row in `.cl_function_assignments()`) but don't stop the walk.
+#'
+#' @param pd A parse-data data frame from `.cl_scan_r_files()`.
+#' @param row A single row of `pd` (e.g. a call site from
+#'   `.cl_find_calls()`) to find the enclosing function names of.
+#' @return A character vector of enclosing function names, innermost
+#'   first. Empty if `row` isn't nested inside any named function (e.g.
+#'   it's a top-level call, or only nested inside anonymous functions).
+#' @noRd
+.cl_enclosing_function_names <- function(pd, row) {
+  assignments <- .cl_function_assignments(pd)
+  fn_names <- stats::setNames(assignments$name, as.character(assignments$id))
+
+  found <- character()
+  current <- row$parent
+  seen <- integer()
+  while (length(current) == 1 && !is.na(current) && current != 0) {
+    if (current %in% seen) break
+    seen <- c(seen, current)
+
+    if (any(pd$parent == current & pd$token == "FUNCTION")) {
+      nm <- unname(fn_names[as.character(current)])
+      if (!is.na(nm)) found <- c(found, nm)
+    }
+
+    parent_row <- pd$parent[pd$id == current]
+    current <- if (length(parent_row) == 0) NA_integer_ else parent_row[1]
+  }
+  found
 }
 
 #' List exported function names from R's always-attached base packages

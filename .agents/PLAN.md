@@ -6,7 +6,7 @@ a changelog: once an item here is completed, its write-up should move to
 [.agents/HISTORY.md](HISTORY.md) and be removed from this file rather than
 marked "done" in place.
 
-Last reviewed: 2026-08-28 (later same day).
+Last reviewed: 2026-08-28 (later still).
 
 ## v1 check inventory
 
@@ -25,11 +25,9 @@ build order (cheapest/highest-value first):
    `Maintainer` fields inconsistent with it (parse via `desc`).
 ### Code checks
 
-5. `check_verbose_output()` -- `print()`/`cat()` used for unsuppressable
-   console output outside `print.*`/`format.*`/`summary.*` S3 methods.
-6. `check_option_restoration()` -- `par()`/`options()`/`setwd()` changed
+5. `check_option_restoration()` -- `par()`/`options()`/`setwd()` changed
    without a paired `on.exit()` restore in the same function.
-7. `check_dontrun_usage()` -- flags `\dontrun{}` for manual review (can't
+6. `check_dontrun_usage()` -- flags `\dontrun{}` for manual review (can't
    judge runnability automatically, so this should be a soft/review-level
    finding, not a hard fail).
 
@@ -67,6 +65,11 @@ build order (cheapest/highest-value first):
   beyond the linted package's own declared dependencies. Deferred from v1
   due to false-positive/maintenance risk; revisit if the narrower
   dependency-only version proves too conservative in practice.
+- `check_verbose_output()` doesn't recognize two of the Cookbook's own
+  accepted mitigations as exemptions: a `cat(..., file = ...)` call
+  writing to a file/connection rather than the console, and a call gated
+  behind a `verbose` argument (`if (verbose) cat(...)`). Revisit if these
+  produce noisy false positives in practice.
 
 ## Canonical-source staleness
 

@@ -358,3 +358,50 @@ Implementation notes:
   source position (verified empirically: in `foo <- function(x) x + 1`,
   the LHS `expr` node for `foo` gets a higher `id` than the `<-` token
   that follows it in the source).
+
+## `check_verbose_output()`
+
+Implemented the first of the three remaining code checks. Flags `print()`/
+`cat()` calls in `R/` that aren't nested inside a function whose name
+matches `^(print|format|summary)\.` (the S3 method naming convention),
+per the CRAN Cookbook's exemption for "printing in special functions like
+print, summary, ... or methods for generic functions".
+
+Needed a more general enclosing-function lookup than existing checks had,
+since a call can be nested arbitrarily deep (including inside anonymous
+helpers, e.g. `lapply(x, function(z) print(z))`) and the check needs to
+know whether *any* named ancestor function is an exempt S3 method, not
+just the innermost one. Added to `R/utils-scan.R`:
+
+- `.cl_function_assignments()` -- a generalization of the existing
+  `.cl_extract_function_names()` that also returns the parse-data `id` of
+  each function-valued assignment's RHS `expr`, not just its name.
+  `.cl_extract_function_names()` is now a one-line wrapper around it,
+  behavior-preserving (verified via the existing `quoted_function_names`
+  tests, which depend on it transitively).
+- `.cl_enclosing_function_names()` -- walks a parse-data row's `parent`
+  chain to the top of the file, and for every ancestor `id` that is a
+  function-definition `expr` (detected the same way as elsewhere in this
+  codebase: `any(pd$parent == id & pd$token == "FUNCTION")`), looks up its
+  name via `.cl_function_assignments()`. Anonymous functions in the chain
+  contribute no name but don't stop the walk, so a call several layers
+  deep still surfaces the nearest *named* enclosing function. A top-level
+  call (no enclosing function at all) correctly returns `character(0)`,
+  which the check treats as "not exempt" -- print/cat with no enclosing
+  function is a real, arguably worse violation (unconditional output on
+  load/attach), not something to skip.
+
+  One implementation pitfall hit during testing: looking up a name via
+  `fn_names[[as.character(id)]]` (double-bracket) throws "subscript out
+  of bounds" for anonymous functions with no matching entry; switched to
+  `unname(fn_names[as.character(id)])` (single-bracket, returns `NA` for
+  a missing name) instead.
+
+Known, documented limitations (over-reporting relative to what CRAN
+actually requires): a `cat(..., file = ...)` call writing to a
+file/connection rather than the console is still flagged, since the
+check doesn't inspect `cat()`'s arguments; and the Cookbook's other
+accepted mitigation -- gating the call behind a `verbose` argument, e.g.
+`if (verbose) cat(...)` -- isn't recognized as an exemption either.
+Both are called out in the function's docstring rather than silently
+handled.
