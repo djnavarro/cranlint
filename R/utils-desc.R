@@ -22,6 +22,64 @@
   gsub("\\s+", " ", trimws(x))
 }
 
+#' Escape a literal string for use inside a regular expression
+#' @noRd
+.cl_regex_escape <- function(x) {
+  gsub("([.\\^$|()\\[\\]{}*+?])", "\\\\\\1", x, perl = TRUE)
+}
+
+#' Check whether a name appears in text without being wrapped in single quotes
+#'
+#' Used by `cl_check_quoted_software_names()`. Matches `name` as a whole
+#' word (so e.g. `"table"` doesn't match inside `"data.table"`), and treats
+#' an occurrence as already-quoted only when a literal `'` immediately
+#' precedes and follows the match -- CRAN's convention of wrapping the
+#' name directly in single quotes with no internal space.
+#'
+#' @param text The text to search (e.g. a package's Title + Description).
+#' @param name The literal name to look for.
+#' @return `TRUE` if `name` occurs at least once in `text` without being
+#'   directly wrapped in single quotes, `FALSE` otherwise (including when
+#'   `name` doesn't appear in `text` at all).
+#' @noRd
+.cl_has_unquoted_occurrence <- function(text, name) {
+  pattern <- paste0("\\b", .cl_regex_escape(name), "\\b")
+  m <- gregexpr(pattern, text, perl = TRUE)[[1]]
+  if (identical(m[1], -1L)) {
+    return(FALSE)
+  }
+
+  lens <- attr(m, "match.length")
+  any(vapply(seq_along(m), function(i) {
+    start <- m[i]
+    end <- start + lens[i] - 1
+    before <- substring(text, start - 1, start - 1)
+    after <- substring(text, end + 1, end + 1)
+    !(before == "'" && after == "'")
+  }, logical(1)))
+}
+
+#' Extract single-quoted, identifier-like tokens from text
+#'
+#' Used by `cl_check_quoted_function_names()`. Matches a single word
+#' (letters/digits/`.`/`_`/`:`, no spaces) wrapped in literal `'`, with an
+#' optional trailing `()`, e.g. `'print'` or `'print()'`. Deliberately
+#' narrow: a quoted multi-word phrase, or a quote pair split across an
+#' English contraction elsewhere in the text (e.g. `"it's"` pairing with
+#' an unrelated later `'`), won't match cleanly and is a known limitation
+#' of matching on plain `'` rather than real markup.
+#'
+#' @param text The text to search (e.g. a package's Title + Description).
+#' @return A character vector of the quoted tokens found (with any
+#'   trailing `()` included), in order of appearance. Empty if none.
+#' @noRd
+.cl_quoted_tokens <- function(text) {
+  regmatches(
+    text,
+    gregexpr("(?<=')[A-Za-z][\\w.:]*(\\(\\))?(?=')", text, perl = TRUE)
+  )[[1]]
+}
+
 #' Reconstruct the Author field CRAN derives from Authors@R
 #'
 #' Mirrors the formatting `R CMD build` applies when generating the

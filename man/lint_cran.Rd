@@ -22,6 +22,8 @@ point, mirroring the role \code{lintr::lint()} plays for that package.
 \details{
 Checks run in this order: \code{cl_check_description_length()},
 \code{cl_check_title_case()}, \code{cl_check_authors_r()},
+\code{cl_check_license_file()}, \code{cl_check_doi_formatting()},
+\code{cl_check_quoted_software_names()}, \code{cl_check_quoted_function_names()},
 \code{cl_check_hardcoded_seed()}, \code{cl_check_global_env_write()},
 \code{cl_check_installed_packages()}, \code{cl_check_warn_suppression()}. If a
 check errors -- for example, because \code{path} has no \code{DESCRIPTION} file at

@@ -1,0 +1,10 @@
+Package: quotedfunctionname
+Title: Tools for Doing Good Things
+Version: 0.1.0
+Authors@R: person("Jane", "Doe", email = "jane@example.com", role = c("aut", "cre"))
+Description: This package provides a small toolkit for doing good things
+    with data, wrapping the base R 'summary' function. It aims to make
+    common good-things workflows easier and more consistent across
+    projects.
+License: MIT + file LICENSE
+Encoding: UTF-8

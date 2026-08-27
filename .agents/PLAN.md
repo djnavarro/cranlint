@@ -6,7 +6,7 @@ a changelog: once an item here is completed, its write-up should move to
 [.agents/HISTORY.md](HISTORY.md) and be removed from this file rather than
 marked "done" in place.
 
-Last reviewed: 2026-08-27.
+Last reviewed: 2026-08-28 (later same day).
 
 ## v1 check inventory
 
@@ -23,33 +23,15 @@ build order (cheapest/highest-value first):
    `tools::toTitleCase()`).
 3. `check_authors_r()` -- missing `Authors@R`, or manual `Author`/
    `Maintainer` fields inconsistent with it (parse via `desc`).
-4. `check_license_file()` -- `+ file LICENSE` referenced when the license
-   type doesn't require an extra file (reference list from
-   `R.home()`'s `share/licenses/license.db`).
-5. `check_quoted_software_names()` -- package/API names (e.g. `python`,
-   `ggplot2`) not wrapped in single quotes in Title/Description. Medium
-   difficulty: needs a heuristic list of known software/package names:
-   high false-positive risk, needs care.
-6. `check_doi_formatting()` -- space after `doi:`/`https:` inside angle
-   brackets, breaking auto-linking.
-
 ### Code checks
 
-7. `check_hardcoded_seed()` -- `set.seed(<literal>)` inside function bodies
-   (excluding `tests/`, `\examples`, `vignettes/`, where it's expected and
-   recommended). This is the check that originally motivated the package.
-8. `check_global_env_write()` -- `<<-` usage that could write to
-   `.GlobalEnv`.
-9. `check_installed_packages()` -- calls to `installed.packages()`, which
-   should be `requireNamespace()`/`require()` instead.
-10. `check_warn_suppression()` -- `options(warn = -1)`.
-11. `check_verbose_output()` -- `print()`/`cat()` used for unsuppressable
-    console output outside `print.*`/`format.*`/`summary.*` S3 methods.
-12. `check_option_restoration()` -- `par()`/`options()`/`setwd()` changed
-    without a paired `on.exit()` restore in the same function.
-13. `check_dontrun_usage()` -- flags `\dontrun{}` for manual review (can't
-    judge runnability automatically, so this should be a soft/review-level
-    finding, not a hard fail).
+5. `check_verbose_output()` -- `print()`/`cat()` used for unsuppressable
+   console output outside `print.*`/`format.*`/`summary.*` S3 methods.
+6. `check_option_restoration()` -- `par()`/`options()`/`setwd()` changed
+   without a paired `on.exit()` restore in the same function.
+7. `check_dontrun_usage()` -- flags `\dontrun{}` for manual review (can't
+   judge runnability automatically, so this should be a soft/review-level
+   finding, not a hard fail).
 
 ### Explicitly out of scope for `cranlint` (static analysis can't do these)
 
@@ -80,6 +62,11 @@ build order (cheapest/highest-value first):
 - `check_core_count()` -- hardcoded core counts / uncapped
   `parallel::detectCores()` (`mc.cores`, `makeCluster(n)` literals). Medium
   difficulty, best-effort only.
+- A static seed list of common non-R software/language names (e.g.
+  "Python", "SQL", "JavaScript") to broaden `check_quoted_software_names()`
+  beyond the linted package's own declared dependencies. Deferred from v1
+  due to false-positive/maintenance risk; revisit if the narrower
+  dependency-only version proves too conservative in practice.
 
 ## Canonical-source staleness
 

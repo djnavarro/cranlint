@@ -117,6 +117,79 @@
   data.frame(name = names, text = texts, stringsAsFactors = FALSE)
 }
 
+#' Find function-valued top-level and nested assignments in parse data
+#'
+#' Walks every `<-`/`=` assignment in `pd` (at any nesting level -- a
+#' helper defined inside another function still counts) and records the
+#' assigned name when the right-hand side is a `function(...)` expression.
+#' Used by `cl_check_quoted_function_names()` to build the list of
+#' function names "owned" by the package being linted.
+#'
+#' @param pd A parse-data data frame from `.cl_scan_r_files()`.
+#' @return A character vector of function names, possibly with
+#'   duplicates removed but otherwise unprocessed (no deduplication across
+#'   multiple files -- callers combine and dedupe themselves).
+#' @noRd
+.cl_extract_function_names <- function(pd) {
+  assigns <- pd[pd$token %in% c("LEFT_ASSIGN", "EQ_ASSIGN"), ]
+  names_out <- character()
+  for (i in seq_len(nrow(assigns))) {
+    a <- assigns[i, ]
+    siblings <- pd[pd$parent == a$parent, ]
+    siblings <- siblings[order(siblings$line1, siblings$col1), ]
+    pos <- which(siblings$id == a$id)
+    if (length(pos) != 1 || pos <= 1 || pos >= nrow(siblings)) next
+
+    lhs_child <- siblings[pos - 1, ]
+    rhs_child <- siblings[pos + 1, ]
+    sym <- pd[pd$parent == lhs_child$id & pd$token == "SYMBOL", ]
+    if (nrow(sym) != 1) next
+
+    if (any(pd$parent == rhs_child$id & pd$token == "FUNCTION")) {
+      names_out <- c(names_out, sym$text)
+    }
+  }
+  names_out
+}
+
+#' List every function name defined anywhere in a package's R/ directory
+#'
+#' @param path Path to the package root. Defaults to the current directory.
+#' @return A unique character vector of function names. Empty if there's
+#'   no `R/` directory or it defines no functions.
+#' @noRd
+.cl_defined_function_names <- function(path = ".") {
+  parsed_files <- .cl_scan_r_files(path)
+  unique(unlist(lapply(parsed_files, .cl_extract_function_names), use.names = FALSE))
+}
+
+#' List exported function names from R's always-attached base packages
+#'
+#' Covers `base`, `stats`, `utils`, and `methods` -- the packages every R
+#' installation ships and (by default) attaches, regardless of what the
+#' linted package depends on. Used by `cl_check_quoted_function_names()`
+#' to catch a quoted reference to a common base R function (e.g.
+#' `'print'`). Looked up via the namespace directly (`getNamespaceExports()`)
+#' rather than the search path, so the result doesn't depend on whether
+#' these packages happen to be attached in the calling session.
+#'
+#' @return A unique character vector of function names.
+#' @noRd
+.cl_base_function_names <- function() {
+  pkgs <- c("base", "stats", "utils", "methods")
+  fn_names <- character()
+  for (pkg in pkgs) {
+    ns <- asNamespace(pkg)
+    exported <- getNamespaceExports(pkg)
+    is_fn <- vapply(exported, function(nm) {
+      exists(nm, envir = ns, inherits = FALSE) &&
+        is.function(get(nm, envir = ns, inherits = FALSE))
+    }, logical(1))
+    fn_names <- c(fn_names, exported[is_fn])
+  }
+  unique(fn_names)
+}
+
 #' Get the source text of each argument expression in a call
 #'
 #' @param pd The parse-data data frame the call row came from.

@@ -275,3 +275,86 @@ the start: `AGENTS.md` at the project root stays a lean, current-state
 reference; scoped-out future work (including the full v1 check inventory)
 lives in `.agents/PLAN.md`; and this file holds the resolved-decision
 record. All three are excluded from the built package via `.Rbuildignore`.
+
+## `check_license_file()` and `check_doi_formatting()`
+
+Implemented the two remaining straightforward DESCRIPTION checks from the
+v1 inventory (`check_quoted_software_names()` was deferred pending a
+separate design discussion of its heuristic word-list approach).
+
+- `cl_check_license_file()` flags a `License` field ending in
+  `+ file LICENSE` where the base license isn't one of the three CRAN
+  templates that actually require the extra file. The templated set (`MIT`,
+  `BSD_2_clause`, `BSD_3_clause`) was derived by reading
+  `R.home()`'s `share/licenses/license.db` and filtering to rows whose
+  `Note` column reads "this is a template, needs + file LICENSE" -- these
+  three abbreviations are the only ones with that note. A `LICENSE` file
+  can legitimately be needed for other licenses too (attribution
+  requirements, extra restrictions), which static analysis can't detect,
+  so the check is scoped only to the "unnecessary reference" direction
+  named in the plan, not the reverse (missing file when required).
+- `cl_check_doi_formatting()` scans the `Description` field for `<...>`
+  spans that look like a `doi:`/`https:` reference and flags whitespace
+  right after the opening `<` or right after the `doi:`/`https:` prefix,
+  either of which breaks CRAN's auto-linking. This is a text-matching
+  heuristic on bracket contents, not a real URL/DOI validator.
+
+Both follow the existing DESCRIPTION-check pattern: `line` is always
+`NA_integer_` (findings aren't tied to a specific line in the raw file),
+and severity is `should_fix` for both (review-and-fix, not an automatic
+CRAN rejection like the `authors_r` mismatch case).
+
+## `check_quoted_software_names()` and `check_quoted_function_names()`
+
+Split the plan's single `check_quoted_software_names()` item into two
+checks after design discussion, since the two failure modes (a real
+software name left unquoted vs. a function name mistakenly quoted) need
+different candidate word lists and warrant different confidence levels.
+
+Design decisions (confirmed with the user before implementation):
+
+- **Candidate list for under-quoting is limited to the linted package's
+  own declared dependencies** (`Depends`/`Imports`/`Suggests`/
+  `LinkingTo` via `desc::get_deps()`, excluding `"R"`), not a general
+  static list of known software/language names (e.g. "Python", "SQL").
+  This keeps precision high and needs no external data, at the cost of
+  under-reporting (it won't catch an unquoted "Python"). A static seed
+  list was considered and explicitly rejected for v1 due to false-positive
+  and maintenance risk -- worth revisiting later if the narrow version
+  proves too conservative in practice.
+- **Function-name candidates for over-quoting come from two sources**:
+  (a) functions defined anywhere in the linted package's own `R/` files,
+  found by walking parse data for any `<-`/`=` assignment (at any nesting
+  level, not just top-level) whose right-hand side is a `function(...)`
+  expression (`.cl_extract_function_names()`/`.cl_defined_function_names()`
+  in `R/utils-scan.R`); and (b) exported functions from `base`, `stats`,
+  `utils`, and `methods`, looked up via `getNamespaceExports()` +
+  `asNamespace()` rather than the search path, so the result doesn't
+  depend on whether those packages happen to be attached in the calling
+  session (`.cl_base_function_names()`, also in `utils-scan.R`). Neither
+  source needed a new dependency.
+- **Severity**: `advisory` for missing quotes (a plain word matching a
+  dependency name doesn't always refer to the package), `should_fix` for
+  a quoted function name (a much more specific, higher-confidence mistake
+  signal).
+
+Implementation notes:
+
+- Quoted-token extraction (`.cl_quoted_tokens()` in `R/utils-desc.R`) uses
+  a lookaround regex `(?<=')[A-Za-z][\w.:]*(\(\))?(?=')` to pull out
+  single-word tokens (with an optional trailing `()`) wrapped in literal
+  `'`. This is a known-limited heuristic: a quoted phrase containing an
+  English contraction (e.g. `'don't'`) can get its internal apostrophe
+  misread as a quote boundary, splitting the token. Considered acceptable
+  since Titles/Descriptions rarely quote contracted phrases.
+- Unquoted-occurrence detection (`.cl_has_unquoted_occurrence()`, also in
+  `utils-desc.R`) matches a candidate name as a whole word (`\b`-bounded,
+  escaped via `.cl_regex_escape()`) and only treats an occurrence as
+  already-quoted when a literal `'` directly precedes and follows the
+  match -- no internal space, matching CRAN's own convention.
+- `.cl_extract_function_names()` walks assignment siblings ordered by
+  `(line1, col1)` rather than `getParseData()`'s `id` column to find the
+  LHS/RHS neighbors of an assignment token -- `id` order does not track
+  source position (verified empirically: in `foo <- function(x) x + 1`,
+  the LHS `expr` node for `foo` gets a higher `id` than the `<-` token
+  that follows it in the source).

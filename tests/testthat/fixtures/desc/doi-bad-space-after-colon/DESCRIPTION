@@ -1,0 +1,9 @@
+Package: doibadcolon
+Title: Tools for Doing Good Things
+Version: 0.1.0
+Authors@R: person("Jane", "Doe", email = "jane@example.com", role = c("aut", "cre"))
+Description: This package provides a small toolkit for doing good things
+    with data. See Smith (2020) <doi: 10.18637/jss.v053.i04> for details
+    on the underlying method.
+License: MIT + file LICENSE
+Encoding: UTF-8

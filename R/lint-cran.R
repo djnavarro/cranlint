@@ -6,6 +6,8 @@
 #'
 #' Checks run in this order: `cl_check_description_length()`,
 #' `cl_check_title_case()`, `cl_check_authors_r()`,
+#' `cl_check_license_file()`, `cl_check_doi_formatting()`,
+#' `cl_check_quoted_software_names()`, `cl_check_quoted_function_names()`,
 #' `cl_check_hardcoded_seed()`, `cl_check_global_env_write()`,
 #' `cl_check_installed_packages()`, `cl_check_warn_suppression()`. If a
 #' check errors -- for example, because `path` has no `DESCRIPTION` file at
@@ -26,6 +28,10 @@ lint_cran <- function(path = ".") {
     cl_check_description_length,
     cl_check_title_case,
     cl_check_authors_r,
+    cl_check_license_file,
+    cl_check_doi_formatting,
+    cl_check_quoted_software_names,
+    cl_check_quoted_function_names,
     cl_check_hardcoded_seed,
     cl_check_global_env_write,
     cl_check_installed_packages,
