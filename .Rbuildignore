@@ -1,3 +1,5 @@
 ^cranlint\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+^AGENTS\.md$
+^\.agents$
