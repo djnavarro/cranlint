@@ -40,21 +40,29 @@ API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
 
 ### Package structure
 
-The package currently contains only the `usethis::create_package()`
-scaffold (`DESCRIPTION`, `NAMESPACE`, `R/cranlint-package.R`, MIT license,
-testthat edition 3 setup). No check functions exist yet.
+The v1 check inventory (see [.agents/HISTORY.md](.agents/HISTORY.md) for
+design write-ups) is fully implemented: twelve `cl_check_*()` functions
+covering DESCRIPTION issues (`description_length`, `title_case`,
+`authors_r`, `license_file`, `doi_formatting`, `quoted_software_names`,
+`quoted_function_names`) and code/doc issues (`hardcoded_seed`,
+`global_env_write`, `installed_packages`, `warn_suppression`,
+`verbose_output`, `option_restoration`, `dontrun_usage`), run together
+by the `lint_cran()` orchestrator.
 
-Planned structure (see [.agents/PLAN.md](.agents/PLAN.md) for the specific
-checks to implement):
+Structure:
 
 ```
 R/
-  check-<name>.R      # One file per check function (e.g. check-seed.R,
-                       # check-description.R), each exporting a
+  check-<name>.R      # One file per check function (e.g. check-hardcoded-seed.R,
+                       # check-description-length.R), each exporting a
                        # cl_check_<name>() function
   lint-cran.R          # Orchestrator that runs all checks and combines
-                       # their output (planned name: lint_cran(), mirroring
-                       # lintr::lint())
+                       # their output: lint_cran(), mirroring lintr::lint()
+  utils-desc.R         # Shared helpers for DESCRIPTION-based checks
+  utils-scan.R         # Shared helpers for parsing/walking R/ source (via
+                       # utils::getParseData())
+  utils-man.R          # Shared helpers for scanning man/*.Rd files
+  utils-result.R        # .cl_new_result(), the check-output constructor
 tests/testthat/
   test-check-<name>.R  # One test file per check function, using small
                        # fixture packages/files under tests/testthat/fixtures/

@@ -448,3 +448,45 @@ without checking it actually restores the same thing that was changed;
 and ordering (the Cookbook says the restore should be registered
 *immediately* after the change) isn't checked either, only that both
 calls exist somewhere in the same frame.
+
+## `check_dontrun_usage()` -- the last v1 check
+
+Implemented the final item from the v1 check inventory. Flags every line
+containing the literal `\dontrun{` markup inside an `\examples{}` block
+in a package's `man/*.Rd` files, as an `advisory`-severity, review-level
+finding (per the user's explicit request) rather than a hard fail --
+`\dontrun{}` is sometimes genuinely necessary (code needing credentials,
+network access, or illustrative pseudo-code) and static analysis can't
+tell that case apart from lazy overuse, so every occurrence is just
+surfaced for a human to judge. This check operates on `man/*.Rd` --
+rendered documentation -- rather than roxygen comments in `R/`, since
+that's what `R CMD check` actually processes regardless of whether the
+source uses roxygen2 or hand-written Rd. Added `.cl_list_man_files()` to
+a new `R/utils-man.R`, mirroring `.cl_list_r_files()` but for `man/`.
+
+No CRAN Cookbook recipe covers `\dontrun{}` specifically (checked the
+Manuals & Documentation Issues chapter directly); `policy_reference`
+instead points at the "Writing R Extensions" manual's documenting-
+functions section, the authoritative source for `\dontrun{}` vs
+`\donttest{}` guidance.
+
+Caught a real false-positive during the self-check sanity pass, not just
+a hypothetical one: an early version matched `\dontrun{` anywhere in the
+file, and flagged `cl_check_dontrun_usage()`'s own generated `.Rd` page --
+its roxygen docstring's prose *about* `\dontrun{}` got rendered by
+roxygen2 into `\verb{\dontrun\{}` inside `\description`/`\details`, which
+still contains the literal substring `\dontrun{` and matched. Fixed by
+scoping the search to lines actually inside an `\examples{}` block:
+added `.cl_brace_delta()` (net unescaped-brace balance of a line, `{`
++1/`}` -1, skipping a brace preceded by `\` since that's Rd's escape for
+a literal brace) and `.cl_examples_lines()` (walks the file tracking
+brace depth from each `\examples{` to its matching `}`, handling
+multiple blocks per file) to `R/utils-man.R`. This is a line-based
+heuristic that assumes `\examples{` appears at the start of its own
+line -- true for roxygen2-generated and virtually all conventionally
+formatted `.Rd` files, but not a full Rd parse.
+
+This completes the v1 check inventory from `.agents/PLAN.md`. All items
+have been implemented; `lint_cran()` now runs all twelve checks, verified
+clean (module the pre-existing `title_case` finding) against cranlint's
+own source throughout development.

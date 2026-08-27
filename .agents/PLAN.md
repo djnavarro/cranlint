@@ -6,7 +6,7 @@ a changelog: once an item here is completed, its write-up should move to
 [.agents/HISTORY.md](HISTORY.md) and be removed from this file rather than
 marked "done" in place.
 
-Last reviewed: 2026-08-28 (later still, again).
+Last reviewed: 2026-08-28 (v1 check inventory now complete).
 
 ## v1 check inventory
 
@@ -23,11 +23,8 @@ build order (cheapest/highest-value first):
    `tools::toTitleCase()`).
 3. `check_authors_r()` -- missing `Authors@R`, or manual `Author`/
    `Maintainer` fields inconsistent with it (parse via `desc`).
-### Code checks
-
-5. `check_dontrun_usage()` -- flags `\dontrun{}` for manual review (can't
-   judge runnability automatically, so this should be a soft/review-level
-   finding, not a hard fail).
+All checks from the v1 inventory have been implemented; see
+`.agents/HISTORY.md` for design write-ups.
 
 ### Explicitly out of scope for `cranlint` (static analysis can't do these)
 

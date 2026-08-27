@@ -3,6 +3,7 @@
 export(cl_check_authors_r)
 export(cl_check_description_length)
 export(cl_check_doi_formatting)
+export(cl_check_dontrun_usage)
 export(cl_check_global_env_write)
 export(cl_check_hardcoded_seed)
 export(cl_check_installed_packages)
