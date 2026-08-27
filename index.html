@@ -59,7 +59,7 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>The goal of cranlint is to catch common, easy-to-miss mistakes made when preparing an R package for CRAN submission – things like hardcoded random seeds, DESCRIPTION formatting issues, and writes to <code>.GlobalEnv</code> – that complement (rather than duplicate) tools like <a href="https://thinkr-open.github.io/checkhelper/" class="external-link">checkhelper</a>, <a href="https://lintr.r-lib.org/" class="external-link">lintr</a>, and <a href="https://docs.ropensci.org/spelling/" class="external-link">spelling</a>.</p>
+<p>The goal of cranlint is to catch common, easy-to-miss mistakes made when preparing an R package for CRAN submission – things like hardcoded random seeds, DESCRIPTION formatting issues, and writes to <code>.GlobalEnv</code> – that complement (rather than duplicate) tools like <a href="https://github.com/r-lib/urlchecker" class="external-link">urlchecker</a>, <a href="https://lintr.r-lib.org/" class="external-link">lintr</a>, and <a href="https://docs.ropensci.org/spelling/" class="external-link">spelling</a>. Many of the checks used in the package are heuristics: do not treat the output as a definitive diagnostic. It exists to help detect common problems, but cannot serve as an authoritative source.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -143,6 +143,8 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://github.com/djnavarro/cranlint/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/djnavarro/cranlint/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
+<li><a href="https://github.com/djnavarro/cranlint/actions/workflows/test-coverage.yaml" class="external-link"><img src="https://github.com/djnavarro/cranlint/actions/workflows/test-coverage.yaml/badge.svg" alt="test-coverage"></a></li>
 </ul>
 </div>
 
