@@ -217,6 +217,32 @@ node that follows it. Refactored `.cl_call_arg_texts()` to be a thin
 wrapper (`.cl_call_args(pd, call_row)$text`) so `hardcoded_seed` didn't
 need to change.
 
+## `lint_cran()` orchestrator
+
+Implemented `lint_cran(path = ".")`, the single top-level entry point that
+runs all seven `cl_check_*()` functions (in `.agents/PLAN.md`'s build
+order: the three DESCRIPTION checks, then the four code checks) and
+combines their results.
+
+Decided to combine results with base `rbind()` rather than adding a
+dependency (`dplyr::bind_rows()` or `vctrs::vec_rbind()`): every check
+already returns the identical schema from `.cl_new_result()`, including
+the same `severity` factor levels, so `rbind()` on same-shaped tibbles
+works cleanly with no coercion surprises (verified directly, including
+rbinding zero-row results).
+
+Decided that per-check errors are **not** caught -- if a check errors
+(e.g. `path` has no `DESCRIPTION` at all), `lint_cran()` lets the error
+propagate rather than swallowing it into a result row, since that signals
+something more fundamental than an individual finding worth flagging. This
+is a different tier from a single malformed R file, which is already
+handled gracefully further down (`.cl_scan_r_files()` skips it with a
+warning without stopping the other checks).
+
+Returns a plain tibble, no new S3 class -- deferred again pending an
+actual need (e.g. a print method grouping findings by severity), per the
+original output-contract decision.
+
 ## Moving to the `.agents/` folder structure
 
 Following the pattern established across other packages (`emaxnls`,
