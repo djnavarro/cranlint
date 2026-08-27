@@ -71,8 +71,12 @@ reports any findings.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Checks run in this order: <code><a href="cl_check_description_length.html">cl_check_description_length()</a></code>,
 <code><a href="cl_check_title_case.html">cl_check_title_case()</a></code>, <code><a href="cl_check_authors_r.html">cl_check_authors_r()</a></code>,
+<code><a href="cl_check_license_file.html">cl_check_license_file()</a></code>, <code><a href="cl_check_doi_formatting.html">cl_check_doi_formatting()</a></code>,
+<code><a href="cl_check_quoted_software_names.html">cl_check_quoted_software_names()</a></code>, <code><a href="cl_check_quoted_function_names.html">cl_check_quoted_function_names()</a></code>,
 <code><a href="cl_check_hardcoded_seed.html">cl_check_hardcoded_seed()</a></code>, <code><a href="cl_check_global_env_write.html">cl_check_global_env_write()</a></code>,
-<code><a href="cl_check_installed_packages.html">cl_check_installed_packages()</a></code>, <code><a href="cl_check_warn_suppression.html">cl_check_warn_suppression()</a></code>. If a
+<code><a href="cl_check_installed_packages.html">cl_check_installed_packages()</a></code>, <code><a href="cl_check_warn_suppression.html">cl_check_warn_suppression()</a></code>,
+<code><a href="cl_check_verbose_output.html">cl_check_verbose_output()</a></code>, <code><a href="cl_check_option_restoration.html">cl_check_option_restoration()</a></code>,
+<code><a href="cl_check_dontrun_usage.html">cl_check_dontrun_usage()</a></code>. If a
 check errors – for example, because <code>path</code> has no <code>DESCRIPTION</code> file at
 all – that error propagates rather than being caught and turned into a
 result row, since it signals something more fundamental than an

@@ -6,10 +6,17 @@
 <url><loc>https://cranlint.djnavarro.net/index.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_authors_r.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_description_length.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cl_check_doi_formatting.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cl_check_dontrun_usage.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_global_env_write.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_hardcoded_seed.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_installed_packages.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cl_check_license_file.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cl_check_option_restoration.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cl_check_quoted_function_names.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cl_check_quoted_software_names.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_title_case.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cl_check_verbose_output.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_warn_suppression.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cranlint-package.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/index.html</loc></url>
