@@ -138,6 +138,59 @@ Fixtures live under `tests/testthat/fixtures/desc/<scenario>/DESCRIPTION`,
 one minimal DESCRIPTION file per scenario (good, short-description,
 bad-title, no-authors-r, authors-r-mismatch, authors-r-consistent).
 
+## First code-scanning checks: `hardcoded_seed`, `global_env_write`, and shared R-file scanning infrastructure
+
+Implemented the first two code-level checks, plus the shared infrastructure
+future code checks will reuse (`R/utils-scan.R`):
+
+- `.cl_list_r_files(path)` -- lists `.R` files under a package's `R/`
+  directory only. This single scoping decision is what satisfies the
+  "excluding `tests/`, `\examples`, `vignettes/`" exclusion called for in
+  `.agents/PLAN.md`'s `hardcoded_seed` write-up, since code checks never
+  look outside `R/` in the first place -- no extra exclusion logic needed.
+- `.cl_parse_r_file()` / `.cl_scan_r_files(path)` -- parse each file with
+  `parse(keep.source = TRUE)` and `utils::getParseData(includeText = TRUE)`,
+  returning a named list of per-file parse-data frames (one file's parse
+  tree can't be safely combined with another's into one data frame, since
+  `id`/`parent` values are only meaningful within a single file's tree). A
+  file with a syntax error is skipped with a `warning()` rather than
+  aborting the whole scan.
+- `.cl_find_calls(pd, fun_names)` / `.cl_call_arg_texts(pd, call_row)` --
+  generic helpers for finding calls to a named function and extracting the
+  source text of each argument expression, reusable by any future check
+  that needs to inspect call arguments (e.g. a later
+  `check_core_count()`).
+
+Chose token-based parsing (`getParseData()`) over regex scanning
+specifically to avoid false positives from comments/strings containing
+text that looks like a flagged call (e.g. a comment reading
+`# set.seed(42) is bad`) -- the parser's tokenizer naturally excludes
+comment/string contents from `SYMBOL_FUNCTION_CALL` tokens. This mirrors
+how `lintr` avoids the same false-positive class.
+
+`cl_check_hardcoded_seed()` flags `set.seed()` calls where any argument's
+source text matches a numeric-literal pattern (positional or named,
+optionally signed, optional `L` suffix), per the Cookbook's
+["Setting a Specific Seed"](https://contributor.r-project.org/cran-cookbook/code_issues.html#setting-a-specific-seed)
+recipe. Severity `should_fix`, since the recipe is a strong, consistent
+CRAN reviewer request rather than a written policy violation.
+
+`cl_check_global_env_write()` flags `<<-`/`->>` usage (both share the
+`LEFT_ASSIGN`/`RIGHT_ASSIGN` token type in `getParseData()`'s output; only
+the `text` field distinguishes them from `<-`/`->`), per the Cookbook's
+["Writing to the .GlobalEnv"](https://contributor.r-project.org/cran-cookbook/code_issues.html#writing-to-the-.globalenv)
+recipe. Severity `must_fix`, since the Cookbook states plainly that
+modifying `.GlobalEnv` "is not allowed by the CRAN policies" -- stronger
+language than the seed recipe. Known limitation, not handled in v1: a
+`<<-` that only reaches a known parent scope (e.g. inside a closure
+factory) is technically safe, and the Cookbook notes 'shiny' packages are
+sometimes excepted; distinguishing these would need real scope analysis,
+so every use is flagged for manual review instead.
+
+Fixtures live under `tests/testthat/fixtures/code/<scenario>/R/*.R`,
+mirroring the `fixtures/desc/<scenario>/DESCRIPTION` pattern used for the
+DESCRIPTION checks.
+
 ## Moving to the `.agents/` folder structure
 
 Following the pattern established across other packages (`emaxnls`,

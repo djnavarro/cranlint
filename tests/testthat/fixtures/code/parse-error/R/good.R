@@ -1,0 +1,3 @@
+noop <- function() {
+  invisible(NULL)
+}

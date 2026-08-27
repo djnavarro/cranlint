@@ -2,4 +2,6 @@
 
 export(cl_check_authors_r)
 export(cl_check_description_length)
+export(cl_check_global_env_write)
+export(cl_check_hardcoded_seed)
 export(cl_check_title_case)
