@@ -71,14 +71,13 @@ automatic rejection.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The generated-value comparison relies on the same (non-exported) base R
-helpers <code>R CMD check</code> itself uses to derive <code>Author</code>/<code>Maintainer</code> from
-<code>Authors@R</code> (<code>utils:::.format_authors_at_R_field_for_author()</code> and
-<code>...for_maintainer()</code>). This is inherently a little fragile – an R
-release could change or remove them – so the comparison is skipped
-(rather than erroring) if they're unavailable; presence of a manual
-field is still reported as informational context in that case, just
-without asserting a match/mismatch.</p>
+    <p>The generated-value comparison reconstructs what <code>R CMD build</code> would
+generate using only the exported <code><a href="https://rdrr.io/r/base/format.html" class="external-link">format()</a></code> generic for <code>person</code>
+objects (see <code>.cl_expected_author()</code>/<code>.cl_expected_maintainer()</code> in
+<code>R/utils-desc.R</code>), rather than calling the unexported base R helpers
+that perform the equivalent comparison during <code>R CMD check</code> – doing so
+via <code>:::</code> produced a dependency NOTE on every check, including in CI,
+even though cranlint isn't meant for CRAN submission itself.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

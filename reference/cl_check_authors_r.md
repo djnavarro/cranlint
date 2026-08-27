@@ -23,11 +23,11 @@ A tibble following the cranlint check-result contract; see `AGENTS.md`.
 
 ## Details
 
-The generated-value comparison relies on the same (non-exported) base R
-helpers `R CMD check` itself uses to derive `Author`/`Maintainer` from
-`Authors@R` (`utils:::.format_authors_at_R_field_for_author()` and
-`...for_maintainer()`). This is inherently a little fragile – an R
-release could change or remove them – so the comparison is skipped
-(rather than erroring) if they're unavailable; presence of a manual
-field is still reported as informational context in that case, just
-without asserting a match/mismatch.
+The generated-value comparison reconstructs what `R CMD build` would
+generate using only the exported
+[`format()`](https://rdrr.io/r/base/format.html) generic for `person`
+objects (see `.cl_expected_author()`/`.cl_expected_maintainer()` in
+`R/utils-desc.R`), rather than calling the unexported base R helpers
+that perform the equivalent comparison during `R CMD check` – doing so
+via `:::` produced a dependency NOTE on every check, including in CI,
+even though cranlint isn't meant for CRAN submission itself.
