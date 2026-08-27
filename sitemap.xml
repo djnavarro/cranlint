@@ -4,6 +4,12 @@
 <url><loc>https://cranlint.djnavarro.net/LICENSE.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/authors.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/index.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cl_check_authors_r.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cl_check_description_length.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cl_check_global_env_write.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cl_check_hardcoded_seed.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cl_check_title_case.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cranlint-package.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/index.html</loc></url>
 </urlset>
 
