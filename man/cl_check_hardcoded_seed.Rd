@@ -22,3 +22,15 @@ a function, is a common CRAN rejection reason. Calls in \verb{tests/},
 at all, since checks only look at \verb{R/} -- because setting a seed there
 is expected and recommended for reproducibility.
 }
+\examples{
+pkg_dir <- cl_example_pkg(
+  r_files = list(simulate.R = c(
+    "simulate <- function() {",
+    "  set.seed(42)",
+    "  rnorm(1)",
+    "}"
+  ))
+)
+cl_check_hardcoded_seed(pkg_dir)
+unlink(pkg_dir, recursive = TRUE)
+}

@@ -21,3 +21,10 @@ recommends. Sentence counting is a heuristic (splitting on \code{.}/\code{!}/\ve
 followed by whitespace or end-of-string) and can be thrown off by
 abbreviations; treat findings as a prompt to review, not gospel.
 }
+\examples{
+pkg_dir <- cl_example_pkg(
+  description = c(Description = "Does a thing.")
+)
+cl_check_description_length(pkg_dir)
+unlink(pkg_dir, recursive = TRUE)
+}

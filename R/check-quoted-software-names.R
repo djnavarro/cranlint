@@ -18,6 +18,18 @@
 #'
 #' @return A tibble following the cranlint check-result contract; see
 #'   `AGENTS.md`.
+#' @examples
+#' pkg_dir <- cl_example_pkg(
+#'   description = c(
+#'     Description = paste(
+#'       "Wraps jsonlite for convenient parsing.",
+#'       "It has no other dependencies."
+#'     ),
+#'     Imports = "jsonlite"
+#'   )
+#' )
+#' cl_check_quoted_software_names(pkg_dir)
+#' unlink(pkg_dir, recursive = TRUE)
 #' @export
 cl_check_quoted_software_names <- function(path = ".") {
   d <- .cl_read_desc(path)

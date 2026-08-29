@@ -23,3 +23,14 @@ safe, but this check can't distinguish that case from an accidental
 global write without deeper scope analysis, so every use is flagged for
 review.
 }
+\examples{
+pkg_dir <- cl_example_pkg(
+  r_files = list(foo.R = c(
+    "set_flag <- function() {",
+    "  flag <<- TRUE",
+    "}"
+  ))
+)
+cl_check_global_env_write(pkg_dir)
+unlink(pkg_dir, recursive = TRUE)
+}

@@ -18,10 +18,16 @@ Flags a \code{License} field that references \verb{+ file LICENSE} alongside a
 base license that isn't one of the CRAN templates requiring an
 additional file. Per the CRAN Cookbook, most licenses are bundled with R
 itself and don't need a \code{LICENSE} file in the package; only \code{MIT},
-\code{BSD_2_clause}, and \code{BSD_3_clause} are templates that do (identifiable
-via the \code{Note} column of \code{R.home()}'s \code{share/licenses/license.db}). A
-\code{LICENSE} file is otherwise only needed when there are additional
-attribution requirements or restrictions beyond the base license, which
-this check can't detect -- so a finding here is a prompt to review, not
-an automatic removal.
+\code{BSD_2_clause}, and \code{BSD_3_clause} are templates that do. A \code{LICENSE}
+file is otherwise only needed when there are additional attribution
+requirements or restrictions beyond the base license, which this check
+can't detect -- so a finding here is a prompt to review, not an
+automatic removal.
+}
+\examples{
+pkg_dir <- cl_example_pkg(
+  description = c(License = "GPL-3 + file LICENSE")
+)
+cl_check_license_file(pkg_dir)
+unlink(pkg_dir, recursive = TRUE)
 }

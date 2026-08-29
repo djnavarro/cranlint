@@ -13,21 +13,29 @@
 #' previously-saved list) is treated as a query/restore rather than a
 #' change and isn't flagged; `par(no.readonly = TRUE)` is also excluded
 #' as it's the standard snapshot-for-later-restore idiom, not a change by
-#' itself. Any other call with at least one named argument is treated as
-#' a change.
+#' itself.
 #'
-#' This is a coarse heuristic in two ways worth knowing about: it doesn't
-#' check that the `on.exit()` call actually restores the *same* thing
-#' that was changed (any `on.exit()` anywhere in the same function frame
-#' counts), and it doesn't check that the restore happens immediately
-#' after the change, only that both are present in the same frame. A
-#' change with no enclosing function at all (so `on.exit()` couldn't
-#' apply even if present) is always flagged.
+#' This is a coarse heuristic: it doesn't check that the `on.exit()` call
+#' actually restores the *same* thing that was changed, or that the
+#' restore happens immediately after the change -- only that both are
+#' present in the same function frame. A change with no enclosing function
+#' at all is always flagged, since `on.exit()` couldn't apply there anyway.
 #'
 #' @param path Path to the package root. Defaults to the current directory.
 #'
 #' @return A tibble following the cranlint check-result contract; see
 #'   `AGENTS.md`.
+#' @examples
+#' pkg_dir <- cl_example_pkg(
+#'   r_files = list(foo.R = c(
+#'     "plot_thing <- function() {",
+#'     "  par(mfrow = c(1, 2))",
+#'     "  plot(1)",
+#'     "}"
+#'   ))
+#' )
+#' cl_check_option_restoration(pkg_dir)
+#' unlink(pkg_dir, recursive = TRUE)
 #' @export
 cl_check_option_restoration <- function(path = ".") {
   parsed_files <- .cl_scan_r_files(path)

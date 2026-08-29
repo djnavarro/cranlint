@@ -19,12 +19,13 @@ Flags a missing \code{Authors@R} field, and flags manually-specified
 from \code{Authors@R} -- per the CRAN Cookbook, that disagreement results in
 automatic rejection.
 }
-\details{
-The generated-value comparison reconstructs what \verb{R CMD build} would
-generate using only the exported \code{format()} generic for \code{person}
-objects (see \code{.cl_expected_author()}/\code{.cl_expected_maintainer()} in
-\code{R/utils-desc.R}), rather than calling the unexported base R helpers
-that perform the equivalent comparison during \verb{R CMD check} -- doing so
-via \code{:::} produced a dependency NOTE on every check, including in CI,
-even though cranlint isn't meant for CRAN submission itself.
+\examples{
+pkg_dir <- cl_example_pkg(
+  description = c(
+    Author = "Someone Else",
+    Maintainer = "Someone Else <someone@example.com>"
+  )
+)
+cl_check_authors_r(pkg_dir)
+unlink(pkg_dir, recursive = TRUE)
 }

@@ -11,6 +11,12 @@
 #'
 #' @return A tibble following the cranlint check-result contract; see
 #'   `AGENTS.md`.
+#' @examples
+#' pkg_dir <- cl_example_pkg(
+#'   description = c(Description = "Does a thing.")
+#' )
+#' cl_check_description_length(pkg_dir)
+#' unlink(pkg_dir, recursive = TRUE)
 #' @export
 cl_check_description_length <- function(path = ".") {
   d <- .cl_read_desc(path)

@@ -12,6 +12,17 @@
 #'
 #' @return A tibble following the cranlint check-result contract; see
 #'   `AGENTS.md`.
+#' @examples
+#' pkg_dir <- cl_example_pkg(
+#'   r_files = list(simulate.R = c(
+#'     "simulate <- function() {",
+#'     "  set.seed(42)",
+#'     "  rnorm(1)",
+#'     "}"
+#'   ))
+#' )
+#' cl_check_hardcoded_seed(pkg_dir)
+#' unlink(pkg_dir, recursive = TRUE)
 #' @export
 cl_check_hardcoded_seed <- function(path = ".") {
   parsed_files <- .cl_scan_r_files(path)

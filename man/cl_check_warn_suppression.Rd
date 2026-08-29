@@ -21,3 +21,14 @@ allowed even when the option is immediately restored afterwards;
 \code{suppressWarnings()} around the specific expression is the recommended
 replacement.
 }
+\examples{
+pkg_dir <- cl_example_pkg(
+  r_files = list(foo.R = c(
+    "quietly <- function() {",
+    "  options(warn = -1)",
+    "}"
+  ))
+)
+cl_check_warn_suppression(pkg_dir)
+unlink(pkg_dir, recursive = TRUE)
+}

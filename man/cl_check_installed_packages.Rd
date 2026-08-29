@@ -21,3 +21,14 @@ package) and shouldn't be used to test whether a package is available;
 \code{find.package()}/\code{system.file()} to locate one, \code{packageDescription()}
 for details of a small number of packages).
 }
+\examples{
+pkg_dir <- cl_example_pkg(
+  r_files = list(foo.R = c(
+    "has_pkg <- function(pkg) {",
+    "  pkg \%in\% rownames(installed.packages())",
+    "}"
+  ))
+)
+cl_check_installed_packages(pkg_dir)
+unlink(pkg_dir, recursive = TRUE)
+}

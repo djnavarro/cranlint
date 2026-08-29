@@ -4,9 +4,9 @@
 \name{cranlint-package}
 \alias{cranlint}
 \alias{cranlint-package}
-\title{cranlint: Static Checks For Common CRAN Submission Mistakes}
+\title{cranlint: Static Checks for Common CRAN Submission Mistakes}
 \description{
-A personal-use package that runs static checks against a package source tree to catch recurring mistakes made before CRAN submission, such as DESCRIPTION formatting issues, hardcoded random seeds, and leftover debugging statements. Complements tools like 'checkhelper' and 'rcmdcheck' rather than replacing them.
+A personal-use package that runs static checks against a package source tree to catch recurring mistakes made before CRAN submission, such as DESCRIPTION formatting issues, fixed random seeds, and leftover debugging statements. Complements tools like 'checkhelper' and 'rcmdcheck' rather than replacing them.
 }
 \seealso{
 Useful links:

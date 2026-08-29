@@ -11,6 +11,16 @@
 #'
 #' @return A tibble following the cranlint check-result contract; see
 #'   `AGENTS.md`.
+#' @examples
+#' pkg_dir <- cl_example_pkg(
+#'   r_files = list(foo.R = c(
+#'     "has_pkg <- function(pkg) {",
+#'     "  pkg %in% rownames(installed.packages())",
+#'     "}"
+#'   ))
+#' )
+#' cl_check_installed_packages(pkg_dir)
+#' unlink(pkg_dir, recursive = TRUE)
 #' @export
 cl_check_installed_packages <- function(path = ".") {
   parsed_files <- .cl_scan_r_files(path)

@@ -22,11 +22,6 @@ can't suppress; CRAN's own exception is printing inside \code{print},
 function.
 }
 \details{
-The enclosing-function lookup walks the full ancestor chain, not just
-the innermost function, so a call nested inside an anonymous helper
-(e.g. inside \code{lapply(x, function(z) ...)}) is still correctly
-attributed to whatever named function encloses that helper.
-
 Two things this check can't detect, so it will over-report relative to
 what CRAN actually requires: a \code{cat()} call writing to a file/connection
 rather than the console (e.g. \code{cat(x, file = "out.txt")}) is still
@@ -34,4 +29,16 @@ flagged, and the Cookbook's other accepted mitigation -- gating the
 call behind a \code{verbose} argument, e.g. \code{if (verbose) cat(...)} -- isn't
 recognized as an exemption. Both are worth a manual look before
 deciding a finding is a real problem.
+}
+\examples{
+pkg_dir <- cl_example_pkg(
+  r_files = list(foo.R = c(
+    "process <- function(x) {",
+    "  cat(\"processing...\\\\n\")",
+    "  x",
+    "}"
+  ))
+)
+cl_check_verbose_output(pkg_dir)
+unlink(pkg_dir, recursive = TRUE)
 }

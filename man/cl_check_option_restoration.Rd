@@ -28,14 +28,23 @@ call with no arguments, or a call whose only arguments are unnamed
 previously-saved list) is treated as a query/restore rather than a
 change and isn't flagged; \code{par(no.readonly = TRUE)} is also excluded
 as it's the standard snapshot-for-later-restore idiom, not a change by
-itself. Any other call with at least one named argument is treated as
-a change.
+itself.
 
-This is a coarse heuristic in two ways worth knowing about: it doesn't
-check that the \code{on.exit()} call actually restores the \emph{same} thing
-that was changed (any \code{on.exit()} anywhere in the same function frame
-counts), and it doesn't check that the restore happens immediately
-after the change, only that both are present in the same frame. A
-change with no enclosing function at all (so \code{on.exit()} couldn't
-apply even if present) is always flagged.
+This is a coarse heuristic: it doesn't check that the \code{on.exit()} call
+actually restores the \emph{same} thing that was changed, or that the
+restore happens immediately after the change -- only that both are
+present in the same function frame. A change with no enclosing function
+at all is always flagged, since \code{on.exit()} couldn't apply there anyway.
+}
+\examples{
+pkg_dir <- cl_example_pkg(
+  r_files = list(foo.R = c(
+    "plot_thing <- function() {",
+    "  par(mfrow = c(1, 2))",
+    "  plot(1)",
+    "}"
+  ))
+)
+cl_check_option_restoration(pkg_dir)
+unlink(pkg_dir, recursive = TRUE)
 }

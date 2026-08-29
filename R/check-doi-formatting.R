@@ -11,6 +11,17 @@
 #'
 #' @return A tibble following the cranlint check-result contract; see
 #'   `AGENTS.md`.
+#' @examples
+#' pkg_dir <- cl_example_pkg(
+#'   description = c(
+#'     Description = paste(
+#'       "See < doi:10.1000/xyz123> for background.",
+#'       "It has no other dependencies."
+#'     )
+#'   )
+#' )
+#' cl_check_doi_formatting(pkg_dir)
+#' unlink(pkg_dir, recursive = TRUE)
 #' @export
 cl_check_doi_formatting <- function(path = ".") {
   d <- .cl_read_desc(path)

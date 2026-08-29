@@ -7,11 +7,6 @@
 #' `summary`, and similar methods, where it's the whole point of the
 #' function.
 #'
-#' The enclosing-function lookup walks the full ancestor chain, not just
-#' the innermost function, so a call nested inside an anonymous helper
-#' (e.g. inside `lapply(x, function(z) ...)`) is still correctly
-#' attributed to whatever named function encloses that helper.
-#'
 #' Two things this check can't detect, so it will over-report relative to
 #' what CRAN actually requires: a `cat()` call writing to a file/connection
 #' rather than the console (e.g. `cat(x, file = "out.txt")`) is still
@@ -24,6 +19,17 @@
 #'
 #' @return A tibble following the cranlint check-result contract; see
 #'   `AGENTS.md`.
+#' @examples
+#' pkg_dir <- cl_example_pkg(
+#'   r_files = list(foo.R = c(
+#'     "process <- function(x) {",
+#'     "  cat(\"processing...\\n\")",
+#'     "  x",
+#'     "}"
+#'   ))
+#' )
+#' cl_check_verbose_output(pkg_dir)
+#' unlink(pkg_dir, recursive = TRUE)
 #' @export
 cl_check_verbose_output <- function(path = ".") {
   parsed_files <- .cl_scan_r_files(path)

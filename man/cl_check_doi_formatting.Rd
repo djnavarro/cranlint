@@ -21,3 +21,15 @@ the reference. This is a text-matching heuristic on \verb{<...>} spans that
 look like a reference; it can't verify the reference is otherwise
 well-formed (e.g. a real DOI).
 }
+\examples{
+pkg_dir <- cl_example_pkg(
+  description = c(
+    Description = paste(
+      "See < doi:10.1000/xyz123> for background.",
+      "It has no other dependencies."
+    )
+  )
+)
+cl_check_doi_formatting(pkg_dir)
+unlink(pkg_dir, recursive = TRUE)
+}

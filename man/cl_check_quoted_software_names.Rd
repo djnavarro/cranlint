@@ -29,3 +29,16 @@ check under-reports (e.g. it won't catch an unquoted "Python"). A plain
 word matching a dependency's name doesn't always refer to the package
 either, so findings are advisory rather than a firm "fix this."
 }
+\examples{
+pkg_dir <- cl_example_pkg(
+  description = c(
+    Description = paste(
+      "Wraps jsonlite for convenient parsing.",
+      "It has no other dependencies."
+    ),
+    Imports = "jsonlite"
+  )
+)
+cl_check_quoted_software_names(pkg_dir)
+unlink(pkg_dir, recursive = TRUE)
+}

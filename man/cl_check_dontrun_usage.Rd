@@ -28,12 +28,24 @@ judge.
 }
 \details{
 Matching is a plain line-based text search for the literal \verb{\dontrun\{}
-markup within an \verb{\\examples\{\}} block, not a full Rd parse -- it
-doesn't distinguish an active \verb{\dontrun{}} from one that's commented
-out with \verb{\%}, and reports one finding per line containing the markup
-rather than per \verb{\dontrun{}} block. The search is deliberately scoped
-to \verb{\\examples\{\}} (see \code{.cl_examples_lines()}) so that prose elsewhere
-in the page that merely \emph{mentions} \verb{\dontrun{}} -- e.g. a \verb{@details}
-tag discussing the markup, as this very function's own documentation
-does -- isn't mistaken for actual usage.
+markup within an \verb{\\examples\{\}} block, not a full Rd parse -- it doesn't
+distinguish an active \verb{\dontrun{}} from one that's commented out with
+\verb{\%}, and reports one finding per line containing the markup rather than
+per \verb{\dontrun{}} block.
+}
+\examples{
+pkg_dir <- cl_example_pkg(
+  man_files = list(foo.Rd = c(
+    "\\\\name{foo}",
+    "\\\\alias{foo}",
+    "\\\\title{Foo}",
+    "\\\\examples{",
+    "\\\\dontrun{",
+    "foo()",
+    "}",
+    "}"
+  ))
+)
+cl_check_dontrun_usage(pkg_dir)
+unlink(pkg_dir, recursive = TRUE)
 }

@@ -20,3 +20,10 @@ intent (proper nouns, quoted software names, etc. keep their original
 casing), so treat a finding as a prompt to review rather than an
 automatic rewrite.
 }
+\examples{
+pkg_dir <- cl_example_pkg(
+  description = c(Title = "an example package")
+)
+cl_check_title_case(pkg_dir)
+unlink(pkg_dir, recursive = TRUE)
+}

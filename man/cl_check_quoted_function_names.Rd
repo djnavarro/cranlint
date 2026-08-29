@@ -21,3 +21,15 @@ CRAN's single-quote convention is for software/package names, not
 function names; quoting a function name is a common sign that the wrong
 thing got quoted (e.g. \code{'summary'} where a software name was meant).
 }
+\examples{
+pkg_dir <- cl_example_pkg(
+  description = c(
+    Description = paste(
+      "Provides a fast 'summary' method.",
+      "It has no other dependencies."
+    )
+  )
+)
+cl_check_quoted_function_names(pkg_dir)
+unlink(pkg_dir, recursive = TRUE)
+}

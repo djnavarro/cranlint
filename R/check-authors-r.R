@@ -5,18 +5,19 @@
 #' from `Authors@R` -- per the CRAN Cookbook, that disagreement results in
 #' automatic rejection.
 #'
-#' The generated-value comparison reconstructs what `R CMD build` would
-#' generate using only the exported `format()` generic for `person`
-#' objects (see `.cl_expected_author()`/`.cl_expected_maintainer()` in
-#' `R/utils-desc.R`), rather than calling the unexported base R helpers
-#' that perform the equivalent comparison during `R CMD check` -- doing so
-#' via `:::` produced a dependency NOTE on every check, including in CI,
-#' even though cranlint isn't meant for CRAN submission itself.
-#'
 #' @param path Path to the package root. Defaults to the current directory.
 #'
 #' @return A tibble following the cranlint check-result contract; see
 #'   `AGENTS.md`.
+#' @examples
+#' pkg_dir <- cl_example_pkg(
+#'   description = c(
+#'     Author = "Someone Else",
+#'     Maintainer = "Someone Else <someone@example.com>"
+#'   )
+#' )
+#' cl_check_authors_r(pkg_dir)
+#' unlink(pkg_dir, recursive = TRUE)
 #' @export
 cl_check_authors_r <- function(path = ".") {
   d <- .cl_read_desc(path)

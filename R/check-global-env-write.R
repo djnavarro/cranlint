@@ -13,6 +13,16 @@
 #'
 #' @return A tibble following the cranlint check-result contract; see
 #'   `AGENTS.md`.
+#' @examples
+#' pkg_dir <- cl_example_pkg(
+#'   r_files = list(foo.R = c(
+#'     "set_flag <- function() {",
+#'     "  flag <<- TRUE",
+#'     "}"
+#'   ))
+#' )
+#' cl_check_global_env_write(pkg_dir)
+#' unlink(pkg_dir, recursive = TRUE)
 #' @export
 cl_check_global_env_write <- function(path = ".") {
   parsed_files <- .cl_scan_r_files(path)
