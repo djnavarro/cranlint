@@ -1,12 +1,12 @@
 Package: cranlint
-Title: Static Checks For Common CRAN Submission Mistakes
+Title: Static Checks for Common CRAN Submission Mistakes
 Version: 0.0.0.9000
 Authors@R: 
     person("Danielle", "Navarro", , "djnavarro@protonmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-7648-6578"))
 Description: A personal-use package that runs static checks against a
     package source tree to catch recurring mistakes made before CRAN
-    submission, such as DESCRIPTION formatting issues, hardcoded random
+    submission, such as DESCRIPTION formatting issues, fixed random
     seeds, and leftover debugging statements. Complements tools like
     'checkhelper' and 'rcmdcheck' rather than replacing them.
 License: MIT + file LICENSE
@@ -18,8 +18,10 @@ RoxygenNote: 8.0.0
 Imports: 
     desc,
     tibble
-Suggests: 
+Suggests:
     pkgdown,
+    spelling,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Config/Needs/website: djnavarro/waeponwifestre
+Language: en-US
