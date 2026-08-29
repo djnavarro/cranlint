@@ -22,3 +22,17 @@ cl_check_description_length(path = ".")
 ## Value
 
 A tibble following the cranlint check-result contract; see `AGENTS.md`.
+
+## Examples
+
+``` r
+pkg_dir <- cl_example_pkg(
+  description = c(Description = "Does a thing.")
+)
+cl_check_description_length(pkg_dir)
+#> # A tibble: 1 × 6
+#>   check              file         line severity   message       policy_reference
+#>   <chr>              <chr>       <int> <ord>      <chr>         <chr>           
+#> 1 description_length DESCRIPTION    NA should_fix The Descript… https://contrib…
+unlink(pkg_dir, recursive = TRUE)
+```

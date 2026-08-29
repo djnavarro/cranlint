@@ -33,8 +33,27 @@ Matching is a plain line-based text search for the literal `\dontrun{`
 markup within an `\examples{}` block, not a full Rd parse – it doesn't
 distinguish an active `\dontrun{}` from one that's commented out with
 `%`, and reports one finding per line containing the markup rather than
-per `\dontrun{}` block. The search is deliberately scoped to
-`\examples{}` (see `.cl_examples_lines()`) so that prose elsewhere in
-the page that merely *mentions* `\dontrun{}` – e.g. a `@details` tag
-discussing the markup, as this very function's own documentation does –
-isn't mistaken for actual usage.
+per `\dontrun{}` block.
+
+## Examples
+
+``` r
+pkg_dir <- cl_example_pkg(
+  man_files = list(foo.Rd = c(
+    "\\name{foo}",
+    "\\alias{foo}",
+    "\\title{Foo}",
+    "\\examples{",
+    "\\dontrun{",
+    "foo()",
+    "}",
+    "}"
+  ))
+)
+cl_check_dontrun_usage(pkg_dir)
+#> # A tibble: 1 × 6
+#>   check         file        line severity message               policy_reference
+#>   <chr>         <chr>      <int> <ord>    <chr>                 <chr>           
+#> 1 dontrun_usage man/foo.Rd     5 advisory "\\dontrun{} used in… https://cran.r-…
+unlink(pkg_dir, recursive = TRUE)
+```

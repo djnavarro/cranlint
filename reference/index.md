@@ -49,5 +49,8 @@
 
   Check for options(warn = )
 
+- [`cl_example_pkg()`](https://cranlint.djnavarro.net/reference/cl_example_pkg.md)
+  : Scaffold a minimal package on disk for trying out cranlint checks
+
 - [`lint_cran()`](https://cranlint.djnavarro.net/reference/lint_cran.md)
   : Run all cranlint checks against a package

@@ -27,3 +27,21 @@ cl_check_installed_packages(path = ".")
 ## Value
 
 A tibble following the cranlint check-result contract; see `AGENTS.md`.
+
+## Examples
+
+``` r
+pkg_dir <- cl_example_pkg(
+  r_files = list(foo.R = c(
+    "has_pkg <- function(pkg) {",
+    "  pkg %in% rownames(installed.packages())",
+    "}"
+  ))
+)
+cl_check_installed_packages(pkg_dir)
+#> # A tibble: 1 × 6
+#>   check              file     line severity   message           policy_reference
+#>   <chr>              <chr>   <int> <ord>      <chr>             <chr>           
+#> 1 installed_packages R/foo.R     2 should_fix installed.packag… https://contrib…
+unlink(pkg_dir, recursive = TRUE)
+```

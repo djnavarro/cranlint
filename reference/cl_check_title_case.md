@@ -22,3 +22,17 @@ cl_check_title_case(path = ".")
 ## Value
 
 A tibble following the cranlint check-result contract; see `AGENTS.md`.
+
+## Examples
+
+``` r
+pkg_dir <- cl_example_pkg(
+  description = c(Title = "an example package")
+)
+cl_check_title_case(pkg_dir)
+#> # A tibble: 1 × 6
+#>   check      file         line severity   message               policy_reference
+#>   <chr>      <chr>       <int> <ord>      <chr>                 <chr>           
+#> 1 title_case DESCRIPTION    NA should_fix "Title does not matc… https://contrib…
+unlink(pkg_dir, recursive = TRUE)
+```

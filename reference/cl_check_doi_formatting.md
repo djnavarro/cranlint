@@ -22,3 +22,22 @@ cl_check_doi_formatting(path = ".")
 ## Value
 
 A tibble following the cranlint check-result contract; see `AGENTS.md`.
+
+## Examples
+
+``` r
+pkg_dir <- cl_example_pkg(
+  description = c(
+    Description = paste(
+      "See < doi:10.1000/xyz123> for background.",
+      "It has no other dependencies."
+    )
+  )
+)
+cl_check_doi_formatting(pkg_dir)
+#> # A tibble: 1 × 6
+#>   check          file         line severity   message           policy_reference
+#>   <chr>          <chr>       <int> <ord>      <chr>             <chr>           
+#> 1 doi_formatting DESCRIPTION    NA should_fix "Reference \"< d… https://contrib…
+unlink(pkg_dir, recursive = TRUE)
+```

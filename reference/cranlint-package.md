@@ -1,8 +1,8 @@
-# cranlint: Static Checks For Common CRAN Submission Mistakes
+# cranlint: Static Checks for Common CRAN Submission Mistakes
 
 A personal-use package that runs static checks against a package source
 tree to catch recurring mistakes made before CRAN submission, such as
-DESCRIPTION formatting issues, hardcoded random seeds, and leftover
+DESCRIPTION formatting issues, fixed random seeds, and leftover
 debugging statements. Complements tools like 'checkhelper' and
 'rcmdcheck' rather than replacing them.
 

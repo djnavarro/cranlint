@@ -10,12 +10,12 @@
 Source:
 [`DESCRIPTION`](https://github.com/djnavarro/cranlint/blob/main/DESCRIPTION)
 
-Navarro D (2026). *cranlint: Static Checks For Common CRAN Submission
+Navarro D (2026). *cranlint: Static Checks for Common CRAN Submission
 Mistakes*. R package version 0.0.0.9000,
 <https://github.com/djnavarro/cranlint>.
 
     @Manual{,
-      title = {cranlint: Static Checks For Common CRAN Submission Mistakes},
+      title = {cranlint: Static Checks for Common CRAN Submission Mistakes},
       author = {Danielle Navarro},
       year = {2026},
       note = {R package version 0.0.0.9000},

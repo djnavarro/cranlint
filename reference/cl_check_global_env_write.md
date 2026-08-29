@@ -24,3 +24,21 @@ cl_check_global_env_write(path = ".")
 ## Value
 
 A tibble following the cranlint check-result contract; see `AGENTS.md`.
+
+## Examples
+
+``` r
+pkg_dir <- cl_example_pkg(
+  r_files = list(foo.R = c(
+    "set_flag <- function() {",
+    "  flag <<- TRUE",
+    "}"
+  ))
+)
+cl_check_global_env_write(pkg_dir)
+#> # A tibble: 1 × 6
+#>   check            file     line severity message               policy_reference
+#>   <chr>            <chr>   <int> <ord>    <chr>                 <chr>           
+#> 1 global_env_write R/foo.R     2 must_fix `<<-` used. This wri… https://contrib…
+unlink(pkg_dir, recursive = TRUE)
+```

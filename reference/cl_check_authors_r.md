@@ -21,13 +21,20 @@ cl_check_authors_r(path = ".")
 
 A tibble following the cranlint check-result contract; see `AGENTS.md`.
 
-## Details
+## Examples
 
-The generated-value comparison reconstructs what `R CMD build` would
-generate using only the exported
-[`format()`](https://rdrr.io/r/base/format.html) generic for `person`
-objects (see `.cl_expected_author()`/`.cl_expected_maintainer()` in
-`R/utils-desc.R`), rather than calling the unexported base R helpers
-that perform the equivalent comparison during `R CMD check` – doing so
-via `:::` produced a dependency NOTE on every check, including in CI,
-even though cranlint isn't meant for CRAN submission itself.
+``` r
+pkg_dir <- cl_example_pkg(
+  description = c(
+    Author = "Someone Else",
+    Maintainer = "Someone Else <someone@example.com>"
+  )
+)
+cl_check_authors_r(pkg_dir)
+#> # A tibble: 2 × 6
+#>   check     file         line severity message                  policy_reference
+#>   <chr>     <chr>       <int> <ord>    <chr>                    <chr>           
+#> 1 authors_r DESCRIPTION    NA must_fix Manual Author field dis… https://contrib…
+#> 2 authors_r DESCRIPTION    NA must_fix Manual Maintainer field… https://contrib…
+unlink(pkg_dir, recursive = TRUE)
+```

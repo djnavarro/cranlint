@@ -24,3 +24,22 @@ cl_check_hardcoded_seed(path = ".")
 ## Value
 
 A tibble following the cranlint check-result contract; see `AGENTS.md`.
+
+## Examples
+
+``` r
+pkg_dir <- cl_example_pkg(
+  r_files = list(simulate.R = c(
+    "simulate <- function() {",
+    "  set.seed(42)",
+    "  rnorm(1)",
+    "}"
+  ))
+)
+cl_check_hardcoded_seed(pkg_dir)
+#> # A tibble: 1 × 6
+#>   check          file          line severity   message          policy_reference
+#>   <chr>          <chr>        <int> <ord>      <chr>            <chr>           
+#> 1 hardcoded_seed R/simulate.R     2 should_fix set.seed() call… https://contrib…
+unlink(pkg_dir, recursive = TRUE)
+```

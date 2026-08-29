@@ -22,3 +22,22 @@ cl_check_quoted_function_names(path = ".")
 ## Value
 
 A tibble following the cranlint check-result contract; see `AGENTS.md`.
+
+## Examples
+
+``` r
+pkg_dir <- cl_example_pkg(
+  description = c(
+    Description = paste(
+      "Provides a fast 'summary' method.",
+      "It has no other dependencies."
+    )
+  )
+)
+cl_check_quoted_function_names(pkg_dir)
+#> # A tibble: 1 × 6
+#>   check                 file         line severity   message    policy_reference
+#>   <chr>                 <chr>       <int> <ord>      <chr>      <chr>           
+#> 1 quoted_function_names DESCRIPTION    NA should_fix 'summary'… https://contrib…
+unlink(pkg_dir, recursive = TRUE)
+```
