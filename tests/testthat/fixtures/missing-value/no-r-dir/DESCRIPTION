@@ -1,0 +1,11 @@
+Package: norpkg
+Title: Package With No R Directory
+Version: 0.1.0
+Authors@R: person("Jane", "Doe", email = "jane@example.com", role = c("aut", "cre"))
+Description: A fixture package with no R/ directory at all, used to
+    exercise cl_check_missing_value() on a package with no exported
+    functions to check.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 8.0.0

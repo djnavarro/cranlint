@@ -490,3 +490,59 @@ This completes the v1 check inventory from `.agents/PLAN.md`. All items
 have been implemented; `lint_cran()` now runs all twelve checks, verified
 clean (module the pre-existing `title_case` finding) against cranlint's
 own source throughout development.
+
+## `check_missing_value()` -- wrapping `checkhelper` after all
+
+The v1 plan scoped missing `\value`/`@return` tags out as "already
+covered by `checkhelper::find_missing_tags()`; wrap rather than
+reimplement" but never actually built the wrapper. Revisited after a
+real CRAN rejection for exactly this reason. Two things had changed/
+needed deciding since the original scoping note:
+
+- `checkhelper::find_missing_tags()` is now deprecated in favor of
+  `checkhelper::audit_tags()` (same underlying logic). `cl_check_missing_value()`
+  calls the current, non-deprecated `audit_tags()` rather than the name
+  literally used in `PLAN.md`, to avoid a `lifecycle` deprecation warning
+  on every call and the risk of the old name being removed later.
+- `audit_tags()` is not a pure read: it loads the target package's
+  namespace and re-runs `roxygen2::roxygenise()` against it, which
+  writes `NAMESPACE`/`man/*.Rd` in place and can add a
+  `Config/roxygen2/version` field to `DESCRIPTION`. Confirmed this
+  experimentally against a scaffolded test package before deciding how
+  to handle it -- every other `cl_check_*()` only reads `path`. Rather
+  than document this as a caveat and let it leak through, `cl_check_missing_value()`
+  copies `path` into a throwaway `tempfile()` directory first
+  (`.cl_copy_to_scratch()`) and runs `audit_tags()` against the copy, so
+  the check is read-only from the caller's point of view like every
+  other check -- verified the original fixture directory is byte-for-
+  byte unchanged after a call in `test-check-missing-value.R`.
+
+Added `checkhelper` to `Suggests` (not `Imports`): it's a heavy
+dependency (`roxygen2`, `pkgload`, `cli`, `dplyr`, `purrr`, `lifecycle`)
+needed by exactly one check, and `cl_check_missing_value()` guards
+`requireNamespace("checkhelper", quietly = TRUE)` before calling it.
+
+`cl_check_missing_value()` was added to `lint_cran()`'s default check
+list, but a plain `Suggests`-missing error from one check shouldn't
+break every other check's results. `requireNamespace()` failure now
+signals a classed condition (`cranlint_missing_checkhelper`) rather than
+a bare `stop()`, so `lint_cran()` can `tryCatch()` specifically that
+class, emit a `warning()`, and contribute `.cl_new_result()`'s empty
+tibble for that one check -- while any other error (e.g. `audit_tags()`
+itself failing to load a package with unmet dependencies) still
+propagates uncaught, matching `lint_cran()`'s existing "errors
+propagate" contract. Calling `cl_check_missing_value()` directly (not
+through `lint_cran()`) still errors outright when `checkhelper` is
+missing.
+
+`audit_tags()`'s `functions` result tibble gives one row per
+roxygen-documented function/method, with `topic` (the documented name),
+`rdname_value` (the `.Rd` file it ends up in, accounting for
+`@rdname`/`@describeIn` aliasing), and `test_has_export_and_return`
+(`"ok"`/`"not_ok"`, already accounting for empty vs. missing `@return`
+and for inherited/aliased returns). Filtering to `"not_ok"` rows and
+mapping `rdname_value` to `man/<rdname_value>.Rd` was enough to produce
+`cranlint`'s standard result shape -- no line number is available
+(`\value` isn't tied to a specific source line the way, say, a
+`set.seed()` call is), so `line` is `NA_integer_` throughout, same
+treatment as other file-level-only findings like `license_file`.

@@ -28,6 +28,19 @@ turned into a result row, since it signals something more fundamental
 than an individual finding. A single unparseable R file, by contrast,
 is already handled gracefully (skipped with a warning) and does not
 stop the other checks from running.
+
+Every check other than \code{cl_check_missing_value()} only reads \code{path}.
+\code{cl_check_missing_value()} wraps \code{checkhelper::audit_tags()}, which
+needs to actually load the package and re-run
+\code{roxygen2::roxygenise()}; to keep \code{lint_cran()} itself side-effect-free
+on the caller's copy of the package, that check runs against a
+disposable copy of \code{path} rather than \code{path} directly (see
+\code{cl_check_missing_value()}'s documentation for details). It also
+relies on the \code{checkhelper} package (Suggests); if that isn't
+installed, \code{lint_cran()} emits a warning and skips just that check
+(contributing no rows) rather than erroring out entirely, so
+\code{lint_cran()} stays usable without it. Calling
+\code{cl_check_missing_value()} directly still errors in that case.
 }
 \examples{
 pkg_dir <- cl_example_pkg(

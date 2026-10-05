@@ -41,13 +41,24 @@ API got here, see [.agents/HISTORY.md](.agents/HISTORY.md).
 ### Package structure
 
 The v1 check inventory (see [.agents/HISTORY.md](.agents/HISTORY.md) for
-design write-ups) is fully implemented: twelve `cl_check_*()` functions
+design write-ups) is fully implemented: fifteen `cl_check_*()` functions
 covering DESCRIPTION issues (`description_length`, `title_case`,
 `authors_r`, `license_file`, `doi_formatting`, `quoted_software_names`,
-`quoted_function_names`) and code/doc issues (`hardcoded_seed`,
+`quoted_function_names`), code/doc issues (`hardcoded_seed`,
 `global_env_write`, `installed_packages`, `warn_suppression`,
-`verbose_output`, `option_restoration`, `dontrun_usage`), run together
-by the `lint_cran()` orchestrator.
+`verbose_output`, `option_restoration`, `dontrun_usage`), and a wrapper
+around `checkhelper::audit_tags()` for missing `\value`/`@return` tags
+(`missing_value`), run together by the `lint_cran()` orchestrator.
+
+`cl_check_missing_value()` is the one check that isn't pure static
+analysis: it delegates to `checkhelper::audit_tags()`, which loads the
+target package and re-runs `roxygen2::roxygenise()` against it. To keep
+every `cl_check_*()` read-only from the caller's point of view, it runs
+that delegation against a disposable copy of the package in a temp
+directory rather than the original `path`. It also depends on
+`checkhelper` (`Suggests` only); `lint_cran()` warns and skips it if
+`checkhelper` isn't installed, but calling `cl_check_missing_value()`
+directly still errors in that case.
 
 Structure:
 

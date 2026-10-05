@@ -19,6 +19,7 @@ Imports:
     desc,
     tibble
 Suggests:
+    checkhelper,
     pkgdown,
     spelling,
     testthat (>= 3.0.0)

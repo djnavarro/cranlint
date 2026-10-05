@@ -13,6 +13,19 @@
 #' is already handled gracefully (skipped with a warning) and does not
 #' stop the other checks from running.
 #'
+#' Every check other than `cl_check_missing_value()` only reads `path`.
+#' `cl_check_missing_value()` wraps `checkhelper::audit_tags()`, which
+#' needs to actually load the package and re-run
+#' `roxygen2::roxygenise()`; to keep `lint_cran()` itself side-effect-free
+#' on the caller's copy of the package, that check runs against a
+#' disposable copy of `path` rather than `path` directly (see
+#' `cl_check_missing_value()`'s documentation for details). It also
+#' relies on the `checkhelper` package (Suggests); if that isn't
+#' installed, `lint_cran()` emits a warning and skips just that check
+#' (contributing no rows) rather than erroring out entirely, so
+#' `lint_cran()` stays usable without it. Calling
+#' `cl_check_missing_value()` directly still errors in that case.
+#'
 #' @param path Path to the package root. Defaults to the current directory.
 #'
 #' @return A tibble following the cranlint check-result contract (see
@@ -46,9 +59,21 @@ lint_cran <- function(path = ".") {
     cl_check_warn_suppression,
     cl_check_verbose_output,
     cl_check_option_restoration,
-    cl_check_dontrun_usage
+    cl_check_dontrun_usage,
+    cl_check_missing_value
   )
 
-  results <- lapply(checks, function(check) check(path))
+  results <- lapply(checks, function(check) {
+    tryCatch(
+      check(path),
+      cranlint_missing_checkhelper = function(e) {
+        warning(
+          "Skipping cl_check_missing_value(): ", conditionMessage(e),
+          call. = FALSE
+        )
+        .cl_new_result()
+      }
+    )
+  })
   do.call(rbind, results)
 }

@@ -33,8 +33,6 @@ All checks from the v1 inventory have been implemented; see
   These belong to `checkhelper::check_as_cran()` / `rcmdcheck`, not here.
 - **Acronym explanation** in DESCRIPTION -- unautomatable, semantic
   judgement call.
-- **Missing `\value`/`@return` tags** -- already covered by
-  `checkhelper::find_missing_tags()`; wrap rather than reimplement.
 - **`T`/`F` instead of `TRUE`/`FALSE`** -- already covered by
   `lintr::T_and_F_symbol_linter()`; wrap rather than reimplement.
 
