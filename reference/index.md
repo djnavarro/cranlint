@@ -28,6 +28,11 @@
 - [`cl_check_license_file()`](https://cranlint.djnavarro.net/reference/cl_check_license_file.md)
   : Check for unnecessary "+ file LICENSE" references
 
+- [`cl_check_missing_value()`](https://cranlint.djnavarro.net/reference/cl_check_missing_value.md)
+  :
+
+  Check for missing `\value`/`@return` documentation
+
 - [`cl_check_option_restoration()`](https://cranlint.djnavarro.net/reference/cl_check_option_restoration.md)
   : Check for unrestored par()/options()/setwd() changes
 

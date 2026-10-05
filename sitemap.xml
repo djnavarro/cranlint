@@ -12,6 +12,7 @@
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_hardcoded_seed.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_installed_packages.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_license_file.html</loc></url>
+<url><loc>https://cranlint.djnavarro.net/reference/cl_check_missing_value.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_option_restoration.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_quoted_function_names.html</loc></url>
 <url><loc>https://cranlint.djnavarro.net/reference/cl_check_quoted_software_names.html</loc></url>

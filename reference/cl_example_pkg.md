@@ -49,6 +49,7 @@ pkg_dir <- cl_example_pkg(
   ))
 )
 lint_cran(pkg_dir)
+#> Warning: roxygen2 requires Encoding: UTF-8
 #> # A tibble: 2 × 6
 #>   check              file          line severity   message      policy_reference
 #>   <chr>              <chr>        <int> <ord>      <chr>        <chr>           

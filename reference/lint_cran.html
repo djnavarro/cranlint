@@ -81,6 +81,18 @@ turned into a result row, since it signals something more fundamental
 than an individual finding. A single unparseable R file, by contrast,
 is already handled gracefully (skipped with a warning) and does not
 stop the other checks from running.</p>
+<p>Every check other than <code><a href="cl_check_missing_value.html">cl_check_missing_value()</a></code> only reads <code>path</code>.
+<code><a href="cl_check_missing_value.html">cl_check_missing_value()</a></code> wraps <code><a href="https://thinkr-open.github.io/checkhelper/reference/audit_tags.html" class="external-link">checkhelper::audit_tags()</a></code>, which
+needs to actually load the package and re-run
+<code><a href="https://roxygen2.r-lib.org/reference/roxygenize.html" class="external-link">roxygen2::roxygenise()</a></code>; to keep <code>lint_cran()</code> itself side-effect-free
+on the caller's copy of the package, that check runs against a
+disposable copy of <code>path</code> rather than <code>path</code> directly (see
+<code><a href="cl_check_missing_value.html">cl_check_missing_value()</a></code>'s documentation for details). It also
+relies on the <code>checkhelper</code> package (Suggests); if that isn't
+installed, <code>lint_cran()</code> emits a warning and skips just that check
+(contributing no rows) rather than erroring out entirely, so
+<code>lint_cran()</code> stays usable without it. Calling
+<code><a href="cl_check_missing_value.html">cl_check_missing_value()</a></code> directly still errors in that case.</p>
     </div>
 
     <div class="section level2">
@@ -95,6 +107,7 @@ stop the other checks from running.</p>
 <span class="r-in"><span>  <span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">lint_cran</span><span class="op">(</span><span class="va">pkg_dir</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>roxygen2 requires Encoding: UTF-8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 6</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   check              file          line severity   message      policy_reference</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;ord&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           </span>

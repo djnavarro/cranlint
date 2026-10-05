@@ -33,6 +33,25 @@ individual finding. A single unparseable R file, by contrast, is already
 handled gracefully (skipped with a warning) and does not stop the other
 checks from running.
 
+Every check other than
+[`cl_check_missing_value()`](https://cranlint.djnavarro.net/reference/cl_check_missing_value.md)
+only reads `path`.
+[`cl_check_missing_value()`](https://cranlint.djnavarro.net/reference/cl_check_missing_value.md)
+wraps
+[`checkhelper::audit_tags()`](https://thinkr-open.github.io/checkhelper/reference/audit_tags.html),
+which needs to actually load the package and re-run
+[`roxygen2::roxygenise()`](https://roxygen2.r-lib.org/reference/roxygenize.html);
+to keep `lint_cran()` itself side-effect-free on the caller's copy of
+the package, that check runs against a disposable copy of `path` rather
+than `path` directly (see
+[`cl_check_missing_value()`](https://cranlint.djnavarro.net/reference/cl_check_missing_value.md)'s
+documentation for details). It also relies on the `checkhelper` package
+(Suggests); if that isn't installed, `lint_cran()` emits a warning and
+skips just that check (contributing no rows) rather than erroring out
+entirely, so `lint_cran()` stays usable without it. Calling
+[`cl_check_missing_value()`](https://cranlint.djnavarro.net/reference/cl_check_missing_value.md)
+directly still errors in that case.
+
 ## Examples
 
 ``` r
@@ -46,6 +65,7 @@ pkg_dir <- cl_example_pkg(
   ))
 )
 lint_cran(pkg_dir)
+#> Warning: roxygen2 requires Encoding: UTF-8
 #> # A tibble: 2 × 6
 #>   check              file          line severity   message      policy_reference
 #>   <chr>              <chr>        <int> <ord>      <chr>        <chr>           
