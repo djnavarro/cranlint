@@ -14,7 +14,6 @@ URL: https://github.com/djnavarro/cranlint, https://cranlint.djnavarro.net/
 BugReports: https://github.com/djnavarro/cranlint/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 8.0.0
 Imports: 
     desc,
     tibble
@@ -26,3 +25,4 @@ Suggests:
 Config/testthat/edition: 3
 Config/Needs/website: djnavarro/waeponwifestre
 Language: en-US
+Config/roxygen2/version: 8.1.0
